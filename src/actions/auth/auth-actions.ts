@@ -11,3 +11,7 @@ export const signInAction = async (
 ) => {
   await signIn(provider);
 };
+
+export const registerUserAction = async (email: string, password: string) => {
+  console.log(email, password);
+};
