@@ -104,7 +104,7 @@ const Login = async () => {
                   id="email"
                   placeholder="Enter your email address"
                   name="email"
-                  className="max-w-full dark:border-gray-400"
+                  className="max-w-full dark:border-gray-600/50"
                 />
                 <Label htmlFor="password" className="text-sm font-semibold">
                   Password
@@ -114,7 +114,7 @@ const Login = async () => {
                   id="password"
                   placeholder="Enter your password"
                   name="password"
-                  className="max-w-full dark:border-gray-400"
+                  className="max-w-full dark:border-gray-600/50"
                 />
                 <Button
                   type="submit"
