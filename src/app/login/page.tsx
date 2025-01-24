@@ -129,7 +129,7 @@ const Login = async () => {
                   Don&apos;t have an account?{" "}
                 </span>
                 <Button variant="link" className="font-semibold text-sm px-1">
-                  <Link href="/register">Sign up</Link>
+                  <Link href="/register">Register</Link>
                 </Button>
               </div>
             </CardContent>
