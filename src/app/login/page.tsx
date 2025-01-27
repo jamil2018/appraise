@@ -90,9 +90,9 @@ const Login = async () => {
                 Or continue with
               </span>
               <Form
-                action={async () => {
+                action={async (formData) => {
                   "use server";
-                  await signInAction("credentials");
+                  await signInAction("credentials", formData);
                 }}
                 className="flex flex-col gap-4"
               >
