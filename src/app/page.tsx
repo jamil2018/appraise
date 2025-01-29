@@ -11,8 +11,11 @@ const Home = () => {
       <Button className="mr-2">
         <Link href="/login">Login</Link>
       </Button>
-      <Button>
+      <Button className="mr-2">
         <Link href="/register">Register</Link>
+      </Button>
+      <Button className="mr-2">
+        <Link href="/dashboard">Dashboard</Link>
       </Button>
     </>
   );
