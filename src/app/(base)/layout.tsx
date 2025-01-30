@@ -13,11 +13,11 @@ export default function BaseLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <nav className="ml-2 py-2">
+    <div className="mx-auto max-w-screen-2xl">
+      <nav className="py-2 mb-6">
         <NavigationMenu>
           <NavigationMenuList className="flex items-center">
-            <NavigationMenuItem>
+            <NavigationMenuItem className="-ml-2">
               <Link href="/dashboard">
                 <Logo />
               </Link>
@@ -41,6 +41,6 @@ export default function BaseLayout({
         </NavigationMenu>
       </nav>
       {children}
-    </>
+    </div>
   );
 }
