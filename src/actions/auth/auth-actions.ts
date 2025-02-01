@@ -16,7 +16,8 @@ export const signInAction = async (
   formData?: FormData
 ) => {
   try {
-    await signIn(provider, formData);
+    const result = await signIn(provider, formData);
+    console.log(result);
     return {
       status: 200,
       message: "User signed in successfully",

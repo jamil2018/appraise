@@ -13,7 +13,7 @@ export default function BaseLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mx-auto max-w-screen-2xl">
+    <div className="mx-auto lg:max-w-screen-xl 2xl:max-w-screen-2xl">
       <nav className="py-2 mb-6">
         <NavigationMenu>
           <NavigationMenuList className="flex items-center">
