@@ -58,7 +58,7 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  console.log(rowSelection);
+  console.log(table.getSelectedRowModel().rows.map((row) => row.original));
 
   return (
     <>

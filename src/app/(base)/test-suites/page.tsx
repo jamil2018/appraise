@@ -1,14 +1,11 @@
 import PageHeader from "@/components/typography/page-header";
 import HeaderSubtitle from "@/components/typography/page-header-subtitle";
 import { TestTubes } from "lucide-react";
-import { auth } from "@/auth";
 import TestSuiteTable from "./test-suite-table";
 import { Suspense } from "react";
 import Loading from "../../../components/ui/loading";
 
 const TestSuites = async () => {
-  const session = await auth();
-  console.log(session?.user);
   return (
     <>
       <div className="mb-8">
