@@ -4,6 +4,7 @@
 import { auth } from "@/auth";
 import prisma from "@/config/db-config";
 import { formOpts } from "@/constants/form-opts/test-suite-form-opts";
+import { Prisma } from "@prisma/client";
 import {
   createServerValidate,
   ServerValidateError,
@@ -20,7 +21,7 @@ const serverValidate = createServerValidate({
 });
 
 export default async function createTestSuiteAction(
-  prev: unknown,
+  _prev: unknown,
   formData: FormData
 ) {
   try {
@@ -31,17 +32,24 @@ export default async function createTestSuiteAction(
     }
     throw e;
   }
-  const session = await auth();
-  await prisma.testSuite.create({
-    data: {
-      name: formData.get("name") as string,
-      description: formData.get("description") as string,
-      creator: {
-        connect: {
-          id: session?.user?.id,
+  try {
+    const session = await auth();
+    await prisma.testSuite.create({
+      data: {
+        name: formData.get("name") as string,
+        description: formData.get("description") as string,
+        creator: {
+          connect: {
+            id: session?.user?.id,
+          },
         },
       },
-    },
-  });
-  return formData;
+    });
+    return formData;
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      console.error(e);
+    }
+    throw e;
+  }
 }

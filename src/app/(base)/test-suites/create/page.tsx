@@ -14,6 +14,9 @@ import { z } from "zod";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ShieldX } from "lucide-react";
 
 const CreateTestSuite = () => {
   const [state, action] = useActionState(
@@ -23,15 +26,18 @@ const CreateTestSuite = () => {
   const form = useForm({
     ...formOpts,
     transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
+    onSubmit: () => {
+      toast({
+        title: "Suite created",
+        description: "Test suite created successfully",
+      });
+    },
   });
   const formErrors = useStore(form.store, (state) => state.errors);
 
   return (
     <>
       <form action={action as never} onSubmit={() => form.handleSubmit()}>
-        {formErrors.map((error) => (
-          <p key={error as string}>{error}</p>
-        ))}
         <form.Field
           name="name"
           validators={{
@@ -42,7 +48,7 @@ const CreateTestSuite = () => {
         >
           {(field) => {
             return (
-              <div>
+              <div className="flex flex-col gap-2 mb-4 lg:w-1/3">
                 <Label htmlFor={field.name}>Name</Label>
                 <Input
                   id={field.name}
@@ -51,7 +57,9 @@ const CreateTestSuite = () => {
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
                 {field.state.meta.errors.map((error) => (
-                  <p key={error as string}>{error}</p>
+                  <p key={error as string} className="text-pink-500 text-xs">
+                    {error}
+                  </p>
                 ))}
               </div>
             );
@@ -60,7 +68,7 @@ const CreateTestSuite = () => {
         <form.Field name="description">
           {(field) => {
             return (
-              <div>
+              <div className="flex flex-col gap-2 mb-4 lg:w-1/3">
                 <Label htmlFor={field.name}>Description</Label>
                 <Input
                   id={field.name}
@@ -69,7 +77,9 @@ const CreateTestSuite = () => {
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
                 {field.state.meta.errors.map((error) => (
-                  <p key={error as string}>{error}</p>
+                  <p key={error as string} className="text-pink-500 text-xs">
+                    {error}
+                  </p>
                 ))}
               </div>
             );
@@ -83,11 +93,31 @@ const CreateTestSuite = () => {
         >
           {([canSubmit, isSubmitting]) => (
             <Button type="submit" disabled={!canSubmit}>
-              {isSubmitting ? "..." : "Submit"}
+              {isSubmitting ? "..." : "Create"}
             </Button>
           )}
         </form.Subscribe>
       </form>
+      {formErrors.length > 0 && (
+        <Card className="mt-4 bg-pink-500 text-white lg:w-1/3">
+          <CardHeader>
+            <CardTitle>
+              <span className="flex items-center">
+                <ShieldX className="w-6 h-6 mr-1" /> Errors
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-8">
+            <ul className="list-disc list-inside">
+              {formErrors.map((error) => (
+                <li key={error as string} className="text-sm">
+                  {error}
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
     </>
   );
 };

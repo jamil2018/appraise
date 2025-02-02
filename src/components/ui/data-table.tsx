@@ -61,7 +61,7 @@ export function DataTable<TData, TValue>({
   console.log(table.getSelectedRowModel().rows.map((row) => row.original));
 
   return (
-    <>
+    <div className="mb-10">
       <div className="flex justify-between mb-4 items-center">
         <div className="flex items-center">
           <Search className="w-6 h-6 mr-2" />
@@ -129,6 +129,6 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
       <DataTablePagination table={table} />
-    </>
+    </div>
   );
 }
