@@ -3,7 +3,7 @@
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
 import { TestSuite } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
-import { Eye, MoreHorizontal, Pencil, Trash } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +15,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link";
+import { deleteTestSuiteAction } from "@/actions/test-suite/test-suite-actions";
+import { toast } from "@/hooks/use-toast";
 
 export const testSuiteTableCols: ColumnDef<TestSuite>[] = [
   {
@@ -93,14 +96,31 @@ export const testSuiteTableCols: ColumnDef<TestSuite>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => console.log(testSuite.id)}>
-              <Eye className="h-4 w-4" /> View
+            <DropdownMenuItem>
+              <Link href={`/test-suites/modify/${testSuite.id}`}>
+                <span className="flex items-center gap-2">
+                  <Pencil className="h-4 w-4" /> Edit
+                </span>
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => console.log(testSuite.id)}>
-              <Pencil className="h-4 w-4" /> Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => console.log(testSuite.id)}>
-              <Trash className="h-4 w-4" /> Delete
+            <DropdownMenuItem
+              onClick={async () => {
+                const res = await deleteTestSuiteAction([testSuite.id]);
+                if (res.success) {
+                  toast({
+                    title: "Test suite deleted successfully",
+                  });
+                } else {
+                  toast({
+                    title: "Error deleting test suite",
+                    description: res.message,
+                  });
+                }
+              }}
+            >
+              <span className="flex items-center gap-2">
+                <Trash className="h-4 w-4" /> Delete
+              </span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

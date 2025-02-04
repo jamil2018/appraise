@@ -9,18 +9,18 @@ import {
   createServerValidate,
   ServerValidateError,
 } from "@tanstack/react-form/nextjs";
+import { revalidatePath } from "next/cache";
 
-// Create the server action that will infer the types of the form from `formOpts`
 const serverValidate = createServerValidate({
   ...formOpts,
   onServerValidate: ({ value }) => {
-    if (value.name.length < 3) {
+    if (value.name.length < 5) {
       return "Server validation: Name must be at least 3 characters";
     }
   },
 });
 
-export default async function createTestSuiteAction(
+export async function createTestSuiteAction(
   _prev: unknown,
   formData: FormData
 ) {
@@ -28,6 +28,8 @@ export default async function createTestSuiteAction(
     await serverValidate(formData);
   } catch (e) {
     if (e instanceof ServerValidateError) {
+      console.error("Server error occurred");
+      console.log(e.formState);
       return e.formState;
     }
     throw e;
@@ -45,11 +47,38 @@ export default async function createTestSuiteAction(
         },
       },
     });
+    revalidatePath("/test-suites");
     return formData;
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
       console.error(e);
     }
+    throw e;
+  }
+}
+
+export async function getAllTestSuitesAction() {
+  try {
+    const testSuites = await prisma.testSuite.findMany();
+    return testSuites;
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+}
+
+export async function deleteTestSuiteAction(id: string[]) {
+  try {
+    await prisma.testSuite.deleteMany({
+      where: { id: { in: id } },
+    });
+    revalidatePath("/test-suites");
+    return {
+      success: true,
+      message: "Test suites deleted successfully",
+    };
+  } catch (e) {
+    console.error(e);
     throw e;
   }
 }

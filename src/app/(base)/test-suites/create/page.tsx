@@ -1,6 +1,6 @@
 "use client";
 
-import createTestSuiteAction from "@/actions/test-suite/test-suite-actions";
+import { createTestSuiteAction } from "@/actions/test-suite/test-suite-actions";
 import { initialFormState } from "@tanstack/react-form/nextjs";
 import React, { useActionState } from "react";
 import {
@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShieldX } from "lucide-react";
+import PageHeader from "@/components/typography/page-header";
+import HeaderSubtitle from "@/components/typography/page-header-subtitle";
 
 const CreateTestSuite = () => {
   const [state, action] = useActionState(
@@ -34,9 +36,17 @@ const CreateTestSuite = () => {
     },
   });
   const formErrors = useStore(form.store, (state) => state.errors);
+  console.log(formErrors);
+  console.log(useStore(form.store, (state) => console.log(state)));
 
   return (
     <>
+      <div className="mb-8">
+        <PageHeader>Create Test Suite</PageHeader>
+        <HeaderSubtitle>
+          Create a new test suite to run your tests against
+        </HeaderSubtitle>
+      </div>
       <form action={action as never} onSubmit={() => form.handleSubmit()}>
         <form.Field
           name="name"
@@ -99,15 +109,15 @@ const CreateTestSuite = () => {
         </form.Subscribe>
       </form>
       {formErrors.length > 0 && (
-        <Card className="mt-4 bg-pink-500 text-white lg:w-1/3">
-          <CardHeader>
+        <Card className="mt-4 bg-pink-500 text-white lg:w-1/3 p-0">
+          <CardHeader className="p-2">
             <CardTitle>
               <span className="flex items-center">
-                <ShieldX className="w-6 h-6 mr-1" /> Errors
+                <ShieldX className="w-6 h-6 mr-1" /> Error(s)
               </span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="px-8">
+          <CardContent className="px-4">
             <ul className="list-disc list-inside">
               {formErrors.map((error) => (
                 <li key={error as string} className="text-sm">
