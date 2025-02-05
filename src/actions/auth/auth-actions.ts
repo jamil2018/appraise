@@ -14,7 +14,7 @@ export const signOutAction = async () => {
 export const signInAction = async (
   provider: "github" | "google" | "credentials",
   formData?: FormData
-) => {
+): Promise<ActionResponse> => {
   try {
     const result = await signIn(provider, formData);
     console.log(result);
@@ -50,11 +50,21 @@ export const registerUserAction = async (
         role: formData.get("reviewer") === "on" ? Role.REVIEWER : Role.TESTER,
       },
     });
-    return { data, message: "User registered successfully" };
+    return {
+      status: 200,
+      data,
+      message: "User registered successfully",
+    };
   } catch (error: unknown) {
     if (error instanceof Error) {
-      return { error: `Failed to register user. Error: ${error.message}` };
+      return {
+        status: 500,
+        error: `Failed to register user. Error: ${error.message}`,
+      };
     }
-    return { error: "Failed to register user" };
+    return {
+      status: 500,
+      error: "Failed to register user",
+    };
   }
 };

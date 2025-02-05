@@ -1,5 +1,10 @@
 export type ActionResponse = {
-  data?: Record<string, unknown>;
+  status: number;
+  data?:
+    | Record<string, unknown>
+    | Record<string, unknown>[]
+    | unknown[]
+    | unknown;
   message?: string;
   error?: string;
 };

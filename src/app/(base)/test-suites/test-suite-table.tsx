@@ -5,14 +5,15 @@ import {
   getAllTestSuitesAction,
   deleteTestSuiteAction,
 } from "@/actions/test-suite/test-suite-actions";
+import { TestSuite } from "@prisma/client";
 
 const TestSuiteTable = async () => {
-  const testSuites = await getAllTestSuitesAction();
+  const { data: testSuites } = await getAllTestSuitesAction();
   return (
     <>
       <DataTable
         columns={testSuiteTableCols}
-        data={testSuites}
+        data={testSuites as TestSuite[]}
         filterColumn="name"
         filterPlaceholder="Filter by name..."
         createLink="/test-suites/create"

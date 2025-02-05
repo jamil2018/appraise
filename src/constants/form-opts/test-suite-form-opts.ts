@@ -1,7 +1,7 @@
 import { formOptions } from "@tanstack/react-form/nextjs";
 import { z } from "zod";
 
-const testSuiteSchema = z.object({
+export const testSuiteSchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters" }),
   description: z.string().optional(),
 });

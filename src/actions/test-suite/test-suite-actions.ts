@@ -3,43 +3,23 @@
 
 import { auth } from "@/auth";
 import prisma from "@/config/db-config";
-import { formOpts } from "@/constants/form-opts/test-suite-form-opts";
+import { testSuiteSchema } from "@/constants/form-opts/test-suite-form-opts";
+import { ActionResponse } from "@/types/form/actionHandler";
 import { Prisma } from "@prisma/client";
-import {
-  createServerValidate,
-  ServerValidateError,
-} from "@tanstack/react-form/nextjs";
 import { revalidatePath } from "next/cache";
-
-const serverValidate = createServerValidate({
-  ...formOpts,
-  onServerValidate: ({ value }) => {
-    if (value.name.length < 5) {
-      return "Server validation: Name must be at least 3 characters";
-    }
-  },
-});
+import { z, ZodError } from "zod";
 
 export async function createTestSuiteAction(
   _prev: unknown,
-  formData: FormData
-) {
+  value: z.infer<typeof testSuiteSchema>
+): Promise<ActionResponse> {
   try {
-    await serverValidate(formData);
-  } catch (e) {
-    if (e instanceof ServerValidateError) {
-      console.error("Server error occurred");
-      console.log(e.formState);
-      return e.formState;
-    }
-    throw e;
-  }
-  try {
+    testSuiteSchema.parse(value);
     const session = await auth();
     await prisma.testSuite.create({
       data: {
-        name: formData.get("name") as string,
-        description: formData.get("description") as string,
+        name: value.name,
+        description: value.description,
         creator: {
           connect: {
             id: session?.user?.id,
@@ -48,34 +28,54 @@ export async function createTestSuiteAction(
       },
     });
     revalidatePath("/test-suites");
-    return formData;
+    return {
+      status: 200,
+      message: "Test suite created successfully",
+    };
   } catch (e) {
-    if (e instanceof Prisma.PrismaClientKnownRequestError) {
-      console.error(e);
+    if (e instanceof ZodError) {
+      return {
+        status: 400,
+        error: e.message,
+      };
     }
-    throw e;
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      return {
+        status: 500,
+        error: e.message,
+      };
+    }
+    return {
+      status: 500,
+      error: "Server error occurred",
+    };
   }
 }
 
-export async function getAllTestSuitesAction() {
+export async function getAllTestSuitesAction(): Promise<ActionResponse> {
   try {
     const testSuites = await prisma.testSuite.findMany();
-    return testSuites;
+    return {
+      status: 200,
+      data: testSuites,
+    };
   } catch (e) {
     console.error(e);
     throw e;
   }
 }
 
-export async function deleteTestSuiteAction(id: string[]) {
+export async function deleteTestSuiteAction(
+  id: string[]
+): Promise<ActionResponse> {
   try {
     await prisma.testSuite.deleteMany({
       where: { id: { in: id } },
     });
     revalidatePath("/test-suites");
     return {
-      success: true,
-      message: "Test suites deleted successfully",
+      status: 200,
+      message: "Test suite(s) deleted successfully",
     };
   } catch (e) {
     console.error(e);

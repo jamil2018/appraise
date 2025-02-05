@@ -27,6 +27,7 @@ import { Pencil, PlusCircle, Search, Trash } from "lucide-react";
 import { Button } from "./button";
 import Link from "next/link";
 import { toast } from "@/hooks/use-toast";
+import { ActionResponse } from "@/types/form/actionHandler";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -35,10 +36,7 @@ interface DataTableProps<TData, TValue> {
   filterPlaceholder: string;
   createLink: string;
   modifyLink: string;
-  deleteAction: (id: string[]) => Promise<{
-    success: boolean;
-    message: string;
-  }>;
+  deleteAction: (id: string[]) => Promise<ActionResponse>;
 }
 
 export function DataTable<TData, TValue>({
@@ -70,7 +68,22 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  console.log(table.getSelectedRowModel().rows.map((row) => row.original));
+  const deleteHandler = async () => {
+    const selectedIds = table
+      .getSelectedRowModel()
+      .rows.map((row) => (row.original as { id: string }).id);
+    const res = await deleteAction(selectedIds);
+    if (res.status === 200) {
+      toast({
+        title: "Test suite(s) deleted successfully",
+      });
+    } else {
+      toast({
+        title: "Error deleting test suite(s)",
+        description: res.message,
+      });
+    }
+  };
 
   return (
     <div className="mb-10">
@@ -107,23 +120,7 @@ export function DataTable<TData, TValue>({
             variant="outline"
             size="icon"
             disabled={table.getSelectedRowModel().rows.length === 0}
-            onClick={async () => {
-              const res = await deleteAction(
-                table
-                  .getSelectedRowModel()
-                  .rows.map((row) => (row.original as { id: string }).id)
-              );
-              if (res.success) {
-                toast({
-                  title: "Test suite(s) deleted successfully",
-                });
-              } else {
-                toast({
-                  title: "Error deleting test suite(s)",
-                  description: res.message,
-                });
-              }
-            }}
+            onClick={deleteHandler}
           >
             <Trash className="w-4 h-4" />
           </Button>

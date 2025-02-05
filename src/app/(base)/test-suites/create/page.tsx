@@ -2,42 +2,44 @@
 
 import { createTestSuiteAction } from "@/actions/test-suite/test-suite-actions";
 import { initialFormState } from "@tanstack/react-form/nextjs";
-import React, { useActionState } from "react";
-import {
-  mergeForm,
-  useForm,
-  useStore,
-  useTransform,
-} from "@tanstack/react-form";
+import React from "react";
+import { useForm } from "@tanstack/react-form";
 import { formOpts } from "@/constants/form-opts/test-suite-form-opts";
 import { z } from "zod";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ShieldX } from "lucide-react";
 import PageHeader from "@/components/typography/page-header";
 import HeaderSubtitle from "@/components/typography/page-header-subtitle";
 
 const CreateTestSuite = () => {
-  const [state, action] = useActionState(
-    createTestSuiteAction,
-    initialFormState
-  );
   const form = useForm({
     ...formOpts,
-    transform: useTransform((baseForm) => mergeForm(baseForm, state!), [state]),
-    onSubmit: () => {
-      toast({
-        title: "Suite created",
-        description: "Test suite created successfully",
-      });
+    onSubmit: async ({ value }) => {
+      const res = await createTestSuiteAction(initialFormState, value);
+      if (res.status === 200) {
+        toast({
+          title: "Suite created",
+          description: "Test suite created successfully",
+        });
+      }
+      if (res.status === 400) {
+        toast({
+          title: "Error",
+          description: res.error,
+          variant: "destructive",
+        });
+      }
+      if (res.status === 500) {
+        toast({
+          title: "Error",
+          description: res.error,
+          variant: "destructive",
+        });
+      }
     },
   });
-  const formErrors = useStore(form.store, (state) => state.errors);
-  console.log(formErrors);
-  console.log(useStore(form.store, (state) => console.log(state)));
 
   return (
     <>
@@ -47,7 +49,13 @@ const CreateTestSuite = () => {
           Create a new test suite to run your tests against
         </HeaderSubtitle>
       </div>
-      <form action={action as never} onSubmit={() => form.handleSubmit()}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
+        }}
+      >
         <form.Field
           name="name"
           validators={{
@@ -108,26 +116,6 @@ const CreateTestSuite = () => {
           )}
         </form.Subscribe>
       </form>
-      {formErrors.length > 0 && (
-        <Card className="mt-4 bg-pink-500 text-white lg:w-1/3 p-0">
-          <CardHeader className="p-2">
-            <CardTitle>
-              <span className="flex items-center">
-                <ShieldX className="w-6 h-6 mr-1" /> Error(s)
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="px-4">
-            <ul className="list-disc list-inside">
-              {formErrors.map((error) => (
-                <li key={error as string} className="text-sm">
-                  {error}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      )}
     </>
   );
 };
