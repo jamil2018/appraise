@@ -60,8 +60,10 @@ export async function getAllTestSuitesAction(): Promise<ActionResponse> {
       data: testSuites,
     };
   } catch (e) {
-    console.error(e);
-    throw e;
+    return {
+      status: 500,
+      error: `Server error occurred: ${e}`,
+    };
   }
 }
 
@@ -78,7 +80,48 @@ export async function deleteTestSuiteAction(
       message: "Test suite(s) deleted successfully",
     };
   } catch (e) {
+    return {
+      status: 500,
+      error: `Server error occurred: ${e}`,
+    };
+  }
+}
+
+export async function getTestSuiteByIdAction(
+  id: string
+): Promise<ActionResponse> {
+  try {
+    const testSuite = await prisma.testSuite.findUnique({ where: { id } });
+    return {
+      status: 200,
+      data: testSuite,
+    };
+  } catch (e) {
     console.error(e);
     throw e;
+  }
+}
+
+export async function updateTestSuiteAction(
+  _prev: unknown,
+  value: z.infer<typeof testSuiteSchema>,
+  id?: string
+): Promise<ActionResponse> {
+  try {
+    testSuiteSchema.parse(value);
+    await prisma.testSuite.update({
+      where: { id },
+      data: value,
+    });
+    revalidatePath("/test-suites");
+    return {
+      status: 200,
+      message: "Test suite updated successfully",
+    };
+  } catch (e) {
+    return {
+      status: 500,
+      error: `Server error occurred: ${e}`,
+    };
   }
 }

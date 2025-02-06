@@ -23,11 +23,12 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableViewOptions } from "./data-table-view-options";
-import { Pencil, PlusCircle, Search, Trash } from "lucide-react";
+import { Pencil, PlusCircle, Search } from "lucide-react";
 import { Button } from "./button";
 import Link from "next/link";
 import { toast } from "@/hooks/use-toast";
 import { ActionResponse } from "@/types/form/actionHandler";
+import DeletePrompt from "../user-prompt/delete-prompt";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -116,14 +117,13 @@ export function DataTable<TData, TValue>({
               <Pencil className="w-4 h-4" />
             </Link>
           </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            disabled={table.getSelectedRowModel().rows.length === 0}
-            onClick={deleteHandler}
-          >
-            <Trash className="w-4 h-4" />
-          </Button>
+          <DeletePrompt
+            isDisabled={table.getSelectedRowModel().rows.length === 0}
+            dialogTitle="Delete Test Suite"
+            dialogDescription="Please confirm your action"
+            confirmationText="Are you sure you want to delete the selected test suite(s)?"
+            deleteHandler={deleteHandler}
+          />
         </div>
       </div>
       <div className="flex justify-between mb-4 items-center">

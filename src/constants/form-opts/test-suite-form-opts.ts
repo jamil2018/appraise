@@ -6,7 +6,7 @@ export const testSuiteSchema = z.object({
   description: z.string().optional(),
 });
 
-type TestSuite = z.infer<typeof testSuiteSchema>;
+export type TestSuite = z.infer<typeof testSuiteSchema>;
 
 export const formOpts = formOptions({
   defaultValues: {
