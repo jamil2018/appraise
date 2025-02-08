@@ -34,6 +34,20 @@ enum TestRunStatus {
   CANCELLED
 }
 
+// Enum for test case statuses inside a test run
+enum TestCaseStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+// Enum for test case results inside a test run
+enum TestCaseResult {
+  PASSED
+  FAILED
+  COULD_NOT_COMPLETE
+}
+
 // Model for Users
 model User {
   id        String      @id @default(uuid())
@@ -136,11 +150,12 @@ model TestRun {
 model TestRunTestCase {
   testRunId     String
   testCaseId    String
-  result        String
+  status        TestCaseStatus // New field for tracking test case execution status
+  result        TestCaseResult? // Updated to use an enum instead of a string
   executionTime Int?
   comments      String?
-  testRun       TestRun  @relation(fields: [testRunId], references: [id])
-  testCase      TestCase @relation(fields: [testCaseId], references: [id])
+  testRun       TestRun         @relation(fields: [testRunId], references: [id])
+  testCase      TestCase        @relation(fields: [testCaseId], references: [id])
 
   @@id([testRunId, testCaseId])
 }
