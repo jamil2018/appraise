@@ -9,6 +9,31 @@ import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z, ZodError } from "zod";
 
+/**
+ * Get all test suites
+ * @returns ActionResponse
+ */
+export async function getAllTestSuitesAction(): Promise<ActionResponse> {
+  try {
+    const testSuites = await prisma.testSuite.findMany();
+    return {
+      status: 200,
+      data: testSuites,
+    };
+  } catch (e) {
+    return {
+      status: 500,
+      error: `Server error occurred: ${e}`,
+    };
+  }
+}
+
+/**
+ * Create a new test suite
+ * @param _prev - Previous state
+ * @param value - Test suite data
+ * @returns ActionResponse
+ */
 export async function createTestSuiteAction(
   _prev: unknown,
   value: z.infer<typeof testSuiteSchema>
@@ -52,21 +77,11 @@ export async function createTestSuiteAction(
   }
 }
 
-export async function getAllTestSuitesAction(): Promise<ActionResponse> {
-  try {
-    const testSuites = await prisma.testSuite.findMany();
-    return {
-      status: 200,
-      data: testSuites,
-    };
-  } catch (e) {
-    return {
-      status: 500,
-      error: `Server error occurred: ${e}`,
-    };
-  }
-}
-
+/**
+ * Delete a test suite
+ * @param id - Test suite id
+ * @returns ActionResponse
+ */
 export async function deleteTestSuiteAction(
   id: string[]
 ): Promise<ActionResponse> {
@@ -87,6 +102,11 @@ export async function deleteTestSuiteAction(
   }
 }
 
+/**
+ * Get a test suite by id
+ * @param id - Test suite id
+ * @returns ActionResponse
+ */
 export async function getTestSuiteByIdAction(
   id: string
 ): Promise<ActionResponse> {
@@ -102,6 +122,13 @@ export async function getTestSuiteByIdAction(
   }
 }
 
+/**
+ * Update a test suite
+ * @param _prev - Previous state
+ * @param value - Test suite data
+ * @param id - Test suite id
+ * @returns ActionResponse
+ */
 export async function updateTestSuiteAction(
   _prev: unknown,
   value: z.infer<typeof testSuiteSchema>,

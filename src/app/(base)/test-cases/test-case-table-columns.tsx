@@ -1,7 +1,7 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
-import { TestSuite } from "@prisma/client";
+import { TestCase } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
 
@@ -16,10 +16,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
-import { deleteTestSuiteAction } from "@/actions/test-suite/test-suite-actions";
+import { deleteTestCaseAction } from "@/actions/test-case/test-case-actionts";
 import { toast } from "@/hooks/use-toast";
 
-export const testSuiteTableCols: ColumnDef<TestSuite>[] = [
+export const testCaseTableCols: ColumnDef<TestCase>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -51,15 +51,27 @@ export const testSuiteTableCols: ColumnDef<TestSuite>[] = [
     ),
   },
   {
-    accessorKey: "name",
+    accessorKey: "title",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Name" />
+      <DataTableColumnHeader column={column} title="Title" />
     ),
   },
   {
     accessorKey: "description",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Description" />
+    ),
+  },
+  {
+    accessorKey: "steps",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Steps" />
+    ),
+  },
+  {
+    accessorKey: "expectedOutcome",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Expected Outcome" />
     ),
   },
   {
@@ -83,7 +95,7 @@ export const testSuiteTableCols: ColumnDef<TestSuite>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const testSuite = row.original;
+      const testCase = row.original;
 
       return (
         <DropdownMenu>
@@ -97,7 +109,7 @@ export const testSuiteTableCols: ColumnDef<TestSuite>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href={`/test-suites/modify/${testSuite.id}`}>
+              <Link href={`/test-cases/modify/${testCase.id}`}>
                 <span className="flex items-center gap-2">
                   <Pencil className="h-4 w-4" /> Edit
                 </span>
@@ -105,14 +117,14 @@ export const testSuiteTableCols: ColumnDef<TestSuite>[] = [
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={async () => {
-                const res = await deleteTestSuiteAction([testSuite.id]);
+                const res = await deleteTestCaseAction([testCase.id]);
                 if (res.status === 200) {
                   toast({
-                    title: "Test suite deleted successfully",
+                    title: "Test case deleted successfully",
                   });
                 } else {
                   toast({
-                    title: "Error deleting test suite",
+                    title: "Error deleting test case",
                     description: res.error,
                   });
                 }
