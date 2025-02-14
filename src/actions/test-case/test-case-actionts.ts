@@ -3,7 +3,9 @@
 import prisma from "@/config/db-config";
 import { ActionResponse } from "@/types/form/actionHandler";
 import { revalidatePath } from "next/cache";
-
+import { testCaseSchema } from "@/constants/form-opts/test-case-form-opts";
+import { z } from "zod";
+import { auth } from "@/auth";
 /**
  * Get all test cases
  * @returns ActionResponse
@@ -39,6 +41,45 @@ export async function deleteTestCaseAction(
     return {
       status: 200,
       message: "Test case(s) deleted successfully",
+    };
+  } catch (e) {
+    return {
+      status: 500,
+      error: `Server error occurred: ${e}`,
+    };
+  }
+}
+
+/**
+ * Create a test case
+ * @param testCase - Test case
+ * @returns ActionResponse
+ */
+export async function createTestCaseAction(
+  _prev: unknown,
+  value: z.infer<typeof testCaseSchema>
+): Promise<ActionResponse> {
+  try {
+    testCaseSchema.parse(value);
+    const session = await auth();
+    const newTestCase = await prisma.testCase.create({
+      data: {
+        title: value.title,
+        description: value.description ?? "",
+        steps: value.steps,
+        expectedOutcome: value.expectedOutcome,
+        creator: {
+          connect: {
+            id: session?.user?.id,
+          },
+        },
+      },
+    });
+
+    return {
+      status: 200,
+      message: "Test case created successfully",
+      data: newTestCase,
     };
   } catch (e) {
     return {

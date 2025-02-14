@@ -69,7 +69,7 @@ model TestCase {
   id                 String               @id @default(uuid())
   title              String
   description        String
-  steps              Json
+  steps              String[]
   expectedOutcome    String
   createdBy          String
   createdAt          DateTime             @default(now())

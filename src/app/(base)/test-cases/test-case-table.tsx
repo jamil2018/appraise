@@ -8,6 +8,7 @@ import { testCaseTableCols } from "./test-case-table-columns";
 
 export default async function TestCaseTable() {
   const { data: testCases } = await getAllTestCasesAction();
+
   return (
     <div>
       <DataTable
