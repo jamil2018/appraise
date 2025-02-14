@@ -88,3 +88,57 @@ export async function createTestCaseAction(
     };
   }
 }
+
+/**
+ * Get a test case by id
+ * @param id - Test case id
+ * @returns ActionResponse
+ */
+export async function getTestCaseByIdAction(
+  id: string
+): Promise<ActionResponse> {
+  try {
+    const testCase = await prisma.testCase.findUnique({
+      where: { id },
+    });
+    return {
+      status: 200,
+      data: testCase,
+    };
+  } catch (e) {
+    return {
+      status: 500,
+      error: `Server error occurred: ${e}`,
+    };
+  }
+}
+
+/**
+ * Update a test case
+ * @param id - Test case id
+ * @param testCase - Test case
+ * @returns ActionResponse
+ */
+export async function updateTestCaseAction(
+  _prev: unknown,
+  value: z.infer<typeof testCaseSchema>,
+  id?: string
+): Promise<ActionResponse> {
+  try {
+    testCaseSchema.parse(value);
+    const updatedTestCase = await prisma.testCase.update({
+      where: { id },
+      data: value,
+    });
+    return {
+      status: 200,
+      message: "Test case updated successfully",
+      data: updatedTestCase,
+    };
+  } catch (e) {
+    return {
+      status: 500,
+      error: `Server error occurred: ${e}`,
+    };
+  }
+}
