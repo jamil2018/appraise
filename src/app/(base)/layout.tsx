@@ -37,6 +37,12 @@ export default function BaseLayout({
             <NavigationMenuItem>
               <NavLink href="/users">Users</NavLink>
             </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavLink href="/reviews">Reviews</NavLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavLink href="/settings">Settings</NavLink>
+            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
       </nav>

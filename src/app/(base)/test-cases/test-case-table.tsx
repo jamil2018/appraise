@@ -10,7 +10,7 @@ export default async function TestCaseTable() {
   const { data: testCases } = await getAllTestCasesAction();
 
   return (
-    <div>
+    <>
       <DataTable
         columns={testCaseTableCols}
         data={testCases as TestCase[]}
@@ -20,6 +20,6 @@ export default async function TestCaseTable() {
         modifyLink="/test-cases/modify"
         deleteAction={deleteTestCaseAction}
       />
-    </div>
+    </>
   );
 }
