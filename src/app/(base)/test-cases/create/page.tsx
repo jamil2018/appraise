@@ -2,7 +2,7 @@ import PageHeader from "@/components/typography/page-header";
 import HeaderSubtitle from "@/components/typography/page-header-subtitle";
 import React from "react";
 import TestCaseForm from "../test-case-form";
-import { createTestCaseAction } from "@/actions/test-case/test-case-actionts";
+import { createTestCaseAction } from "@/actions/test-case/test-case-actions";
 
 const CreateTestCase = () => {
   return (

@@ -1,15 +1,22 @@
+import { ReviewStatus } from "@prisma/client";
 import { formOptions } from "@tanstack/react-form/nextjs";
 import { z } from "zod";
 
 export const reviewSchema = z.object({
-  title: z.string().min(3, { message: "Title must be at least 3 characters" }),
+  testCaseId: z.string().min(1, { message: "Test case is required" }),
+  status: z.nativeEnum(ReviewStatus),
+  comments: z.string().optional(),
+  reviewerId: z.string().min(1, { message: "Reviewer is required" }),
 });
 
 export type Review = z.infer<typeof reviewSchema>;
 
 export const formOpts = formOptions({
   defaultValues: {
-    title: "",
+    testCaseId: "",
+    status: "PENDING",
+    comments: "",
+    reviewerId: "",
   },
   validators: {
     onChange: reviewSchema,

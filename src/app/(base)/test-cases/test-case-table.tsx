@@ -1,7 +1,7 @@
 import {
   deleteTestCaseAction,
   getAllTestCasesAction,
-} from "@/actions/test-case/test-case-actionts";
+} from "@/actions/test-case/test-case-actions";
 import { DataTable } from "@/components/ui/data-table";
 import { TestCase } from "@prisma/client";
 import { testCaseTableCols } from "./test-case-table-columns";

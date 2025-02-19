@@ -1,7 +1,7 @@
 import {
   getTestCaseByIdAction,
   updateTestCaseAction,
-} from "@/actions/test-case/test-case-actionts";
+} from "@/actions/test-case/test-case-actions";
 import { TestCase } from "@prisma/client";
 import React from "react";
 import TestCaseForm from "../../test-case-form";

@@ -5,14 +5,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
 import {
+  DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DropdownMenu } from "@/components/ui/dropdown-menu";
-import { Link } from "@radix-ui/react-navigation-menu";
+import Link from "next/link";
 import { toast } from "@/hooks/use-toast";
 import { MoreHorizontal, Pencil } from "lucide-react";
 import { deleteReviewAction } from "@/actions/review/review-actions";
@@ -89,7 +89,7 @@ export const reviewTableCols: ColumnDef<ReviewWithRelations>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const testCase = row.original;
+      const review = row.original;
 
       return (
         <DropdownMenu>
@@ -103,7 +103,7 @@ export const reviewTableCols: ColumnDef<ReviewWithRelations>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href={`/reviews/modify/${testCase.id}`}>
+              <Link href={`/reviews/modify/${review.id}`}>
                 <span className="flex items-center gap-2">
                   <Pencil className="h-4 w-4" /> Edit
                 </span>
@@ -111,7 +111,7 @@ export const reviewTableCols: ColumnDef<ReviewWithRelations>[] = [
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={async () => {
-                const res = await deleteReviewAction([testCase.id]);
+                const res = await deleteReviewAction([review.id]);
                 if (res.status === 200) {
                   toast({
                     title: "Review deleted successfully",

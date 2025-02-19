@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
-import { deleteTestCaseAction } from "@/actions/test-case/test-case-actionts";
+import { deleteTestCaseAction } from "@/actions/test-case/test-case-actions";
 import { toast } from "@/hooks/use-toast";
 
 export const testCaseTableCols: ColumnDef<TestCase>[] = [
