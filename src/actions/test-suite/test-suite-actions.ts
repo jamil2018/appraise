@@ -45,6 +45,9 @@ export async function createTestSuiteAction(
       data: {
         name: value.name,
         description: value.description,
+        testCases: {
+          connect: value.testCases?.map((id) => ({ id })),
+        },
         creator: {
           connect: {
             id: session?.user?.id,
@@ -138,7 +141,13 @@ export async function updateTestSuiteAction(
     testSuiteSchema.parse(value);
     await prisma.testSuite.update({
       where: { id },
-      data: value,
+      data: {
+        name: value.name,
+        description: value.description,
+        testCases: {
+          connect: value.testCases?.map((id) => ({ id })),
+        },
+      },
     });
     revalidatePath("/test-suites");
     return {

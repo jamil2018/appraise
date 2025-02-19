@@ -112,6 +112,7 @@ export const TestSuiteForm = ({
           );
         }}
       </form.Field>
+
       <form.Subscribe
         selector={(formState) => [formState.canSubmit, formState.isSubmitting]}
       >

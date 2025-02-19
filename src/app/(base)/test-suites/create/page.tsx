@@ -3,7 +3,7 @@ import { TestSuiteForm } from "../test-suite-form";
 import PageHeader from "@/components/typography/page-header";
 import HeaderSubtitle from "@/components/typography/page-header-subtitle";
 
-const CreateTestSuite = () => {
+const CreateTestSuite = async () => {
   return (
     <>
       <div className="mb-8">
