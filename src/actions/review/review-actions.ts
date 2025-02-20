@@ -19,6 +19,7 @@ export interface ReviewWithRelations extends Review {
 
 export async function getAllReviewsAction(): Promise<ActionResponse> {
   try {
+    const session = await auth();
     const reviews = await prisma.review.findMany({
       include: {
         testCase: {
@@ -31,6 +32,9 @@ export async function getAllReviewsAction(): Promise<ActionResponse> {
             username: true,
           },
         },
+      },
+      where: {
+        reviewerId: session?.user?.id ?? "",
       },
     });
     return {

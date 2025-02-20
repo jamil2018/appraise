@@ -135,6 +135,7 @@ export const TestSuiteForm = ({
                 placeholder="Select test case(s)"
                 emptyMessage="No test case(s) found"
                 selectedLabel="Selected test case(s)"
+                searchPlaceholder="Search test cases..."
               />
             </div>
           );

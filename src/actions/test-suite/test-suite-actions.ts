@@ -148,7 +148,7 @@ export async function updateTestSuiteAction(
         name: value.name,
         description: value.description,
         testCases: {
-          connect: value.testCases?.map((id) => ({ id })),
+          set: value.testCases?.map((id) => ({ id })),
         },
       },
     });

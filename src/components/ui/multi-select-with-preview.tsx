@@ -33,6 +33,7 @@ interface MultiSelectWithPreviewProps {
   selectedLabel?: string;
   onSelectChange: (value: string[]) => void;
   defaultSelectedValues?: string[];
+  searchPlaceholder?: string;
 }
 
 export function MultiSelectWithPreview({
@@ -43,6 +44,7 @@ export function MultiSelectWithPreview({
   selectedLabel = "option(s) selected",
   onSelectChange,
   defaultSelectedValues = [],
+  searchPlaceholder = "Search options...",
 }: MultiSelectWithPreviewProps) {
   const [open, setOpen] = React.useState(false);
   const [selectedValues, setSelectedValues] = React.useState<string[]>(
@@ -76,7 +78,7 @@ export function MultiSelectWithPreview({
         <PopoverContent className="w-full max-w-[600px] p-0" align="start">
           <Command className="w-full">
             <CommandInput
-              placeholder={`Search ${placeholder.toLowerCase()}...`}
+              placeholder={searchPlaceholder ?? `Search item(s)...`}
               className="w-full"
             />
             <CommandList className="w-full">
