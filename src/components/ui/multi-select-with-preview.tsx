@@ -26,22 +26,28 @@ interface Option {
 }
 
 interface MultiSelectWithPreviewProps {
+  id: string;
   options: Option[];
   placeholder?: string;
   emptyMessage?: string;
   selectedLabel?: string;
   onSelectChange: (value: string[]) => void;
+  defaultSelectedValues?: string[];
 }
 
 export function MultiSelectWithPreview({
+  id,
   options,
   placeholder = "Select options...",
   emptyMessage = "No option found.",
   selectedLabel = "option(s) selected",
   onSelectChange,
+  defaultSelectedValues = [],
 }: MultiSelectWithPreviewProps) {
   const [open, setOpen] = React.useState(false);
-  const [selectedValues, setSelectedValues] = React.useState<string[]>([]);
+  const [selectedValues, setSelectedValues] = React.useState<string[]>(
+    defaultSelectedValues
+  );
 
   const handleSelect = (value: string) => {
     const newSelectedValues = selectedValues.includes(value)
@@ -62,7 +68,7 @@ export function MultiSelectWithPreview({
             className="w-fit max-w-[600px] justify-between"
           >
             {selectedValues.length > 0
-              ? `${selectedValues.length} ${selectedLabel}`
+              ? `${selectedValues.length} ${selectedLabel.toLowerCase()}`
               : placeholder}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
@@ -79,6 +85,7 @@ export function MultiSelectWithPreview({
                 {options.map((option) => (
                   <CommandItem
                     key={option.value}
+                    id={id}
                     onSelect={() => handleSelect(option.value)}
                     className="w-full"
                   >

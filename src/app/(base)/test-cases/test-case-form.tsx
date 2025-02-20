@@ -177,7 +177,7 @@ const TestCaseForm = ({
       >
         {([canSubmit, isSubmitting]) => (
           <Button type="submit" disabled={!canSubmit}>
-            {isSubmitting ? "..." : "Create"}
+            {isSubmitting ? "..." : "Save"}
           </Button>
         )}
       </form.Subscribe>

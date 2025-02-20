@@ -114,7 +114,10 @@ export async function getTestSuiteByIdAction(
   id: string
 ): Promise<ActionResponse> {
   try {
-    const testSuite = await prisma.testSuite.findUnique({ where: { id } });
+    const testSuite = await prisma.testSuite.findUnique({
+      where: { id },
+      include: { testCases: true },
+    });
     return {
       status: 200,
       data: testSuite,
