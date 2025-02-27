@@ -1,19 +1,19 @@
 import React from "react";
 import { DataTable } from "@/components/ui/data-table";
-import { reviewTableCols } from "./review-table-columns";
+import { reviewTableByCreatorCols } from "./review-table-by-creator-columns";
 import {
-  getAllReviewsAction,
+  getAllReviewsByCreatorAction,
   deleteReviewAction,
   ReviewWithRelations,
 } from "@/actions/review/review-actions";
 
-const ReviewTable = async () => {
-  const { data: reviews } = await getAllReviewsAction();
+const ReviewTableByCreator = async () => {
+  const { data: reviews } = await getAllReviewsByCreatorAction();
 
   return (
     <>
       <DataTable
-        columns={reviewTableCols}
+        columns={reviewTableByCreatorCols}
         data={reviews as ReviewWithRelations[]}
         filterColumn="id"
         filterPlaceholder="Filter by id..."
@@ -25,4 +25,4 @@ const ReviewTable = async () => {
   );
 };
 
-export default ReviewTable;
+export default ReviewTableByCreator;

@@ -17,7 +17,7 @@ export interface ReviewWithRelations extends Review {
   };
 }
 
-export async function getAllReviewsAction(): Promise<ActionResponse> {
+export async function getReviewsByReviewerAction(): Promise<ActionResponse> {
   try {
     const session = await auth();
     const reviews = await prisma.review.findMany({
@@ -35,6 +35,38 @@ export async function getAllReviewsAction(): Promise<ActionResponse> {
       },
       where: {
         reviewerId: session?.user?.id ?? "",
+      },
+    });
+    return {
+      status: 200,
+      data: reviews,
+    };
+  } catch (e) {
+    return {
+      status: 500,
+      error: `Server error occurred: ${e}`,
+    };
+  }
+}
+
+export async function getAllReviewsByCreatorAction(): Promise<ActionResponse> {
+  try {
+    const session = await auth();
+    const reviews = await prisma.review.findMany({
+      include: {
+        testCase: {
+          select: {
+            title: true,
+          },
+        },
+        reviewer: {
+          select: {
+            username: true,
+          },
+        },
+      },
+      where: {
+        createdBy: session?.user?.id ?? "",
       },
     });
     return {

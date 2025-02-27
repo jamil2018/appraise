@@ -1,13 +1,14 @@
 "use client";
 
-import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
-import { TestSuite } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
-
 import { Checkbox } from "@/components/ui/checkbox";
+import { deleteReviewAction } from "@/actions/review/review-actions";
+import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
+import { ReviewWithRelations } from "@/actions/review/review-actions";
 import TableActions from "@/components/table/table-actions";
-import { deleteTestSuiteAction } from "@/actions/test-suite/test-suite-actions";
-export const testSuiteTableCols: ColumnDef<TestSuite>[] = [
+import { ScanEye } from "lucide-react";
+
+export const reviewTableByReviewerCols: ColumnDef<ReviewWithRelations>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -39,15 +40,15 @@ export const testSuiteTableCols: ColumnDef<TestSuite>[] = [
     ),
   },
   {
-    accessorKey: "name",
+    accessorKey: "testCase.title",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Name" />
+      <DataTableColumnHeader column={column} title="Test Case" />
     ),
   },
   {
-    accessorKey: "description",
+    accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Description" />
+      <DataTableColumnHeader column={column} title="Status" />
     ),
   },
   {
@@ -71,11 +72,14 @@ export const testSuiteTableCols: ColumnDef<TestSuite>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const testSuite = row.original;
+      const review = row.original;
+
       return (
         <TableActions
-          modifyLink={`/test-suites/modify/${testSuite.id}`}
-          deleteHandler={() => deleteTestSuiteAction([testSuite.id])}
+          modifyLink={`/reviews/review/${review.id}`}
+          deleteHandler={() => deleteReviewAction([review.id])}
+          editActionText="Review"
+          editActionIcon={<ScanEye className="h-4 w-4" />}
         />
       );
     },

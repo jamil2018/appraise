@@ -10,7 +10,7 @@ import PageHeader from "@/components/typography/page-header";
 import { getAllTestCasesAction } from "@/actions/test-case/test-case-actions";
 import { getAllUsersAction } from "@/actions/user/user-actions";
 
-const ModifyReview = async ({
+const ProviderReview = async ({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -29,12 +29,12 @@ const ModifyReview = async ({
   return (
     <>
       <div className="mb-8">
-        <PageHeader>Modify Review</PageHeader>
-        <HeaderSubtitle>Modify a review</HeaderSubtitle>
+        <PageHeader>Provide Review</PageHeader>
+        <HeaderSubtitle>Provide a review for the test case</HeaderSubtitle>
       </div>
       <ReviewForm
-        successTitle="Review updated"
-        successMessage="Review updated successfully"
+        successTitle="Review provided"
+        successMessage="Review provided successfully"
         onSubmitAction={updateReviewAction}
         id={id}
         defaultValues={{
@@ -43,7 +43,7 @@ const ModifyReview = async ({
           status: review.status,
           comments: review.comments ?? "",
         }}
-        hideComments={true}
+        hideTestCaseSelect={true}
         users={users as User[]}
         testCases={testCases as TestCase[]}
       />
@@ -51,4 +51,4 @@ const ModifyReview = async ({
   );
 };
 
-export default ModifyReview;
+export default ProviderReview;

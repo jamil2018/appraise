@@ -3,21 +3,9 @@
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
 import { TestCase } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Trash } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
-import Link from "next/link";
 import { deleteTestCaseAction } from "@/actions/test-case/test-case-actions";
-import { toast } from "@/hooks/use-toast";
+import TableActions from "@/components/table/table-actions";
 
 export const testCaseTableCols: ColumnDef<TestCase>[] = [
   {
@@ -98,44 +86,10 @@ export const testCaseTableCols: ColumnDef<TestCase>[] = [
       const testCase = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link href={`/test-cases/modify/${testCase.id}`}>
-                <span className="flex items-center gap-2">
-                  <Pencil className="h-4 w-4" /> Edit
-                </span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={async () => {
-                const res = await deleteTestCaseAction([testCase.id]);
-                if (res.status === 200) {
-                  toast({
-                    title: "Test case deleted successfully",
-                  });
-                } else {
-                  toast({
-                    title: "Error deleting test case",
-                    description: res.error,
-                  });
-                }
-              }}
-            >
-              <span className="flex items-center gap-2">
-                <Trash className="h-4 w-4" /> Delete
-              </span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <TableActions
+          modifyLink={`/test-cases/modify/${testCase.id}`}
+          deleteHandler={() => deleteTestCaseAction([testCase.id])}
+        />
       );
     },
   },

@@ -37,6 +37,7 @@ const CreateReview = async () => {
         onSubmitAction={createReviewAction}
         users={users}
         testCases={testCases}
+        hideComments={true}
       />
     </>
   );

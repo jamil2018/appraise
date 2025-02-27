@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { formOpts, Review } from "@/constants/form-opts/review-form-opts";
 import { toast } from "@/hooks/use-toast";
 import { ActionResponse } from "@/types/form/actionHandler";
@@ -27,6 +28,8 @@ const ReviewForm = ({
   onSubmitAction,
   users,
   testCases,
+  hideTestCaseSelect = false,
+  hideComments = false,
 }: {
   defaultValues?: Review;
   successTitle: string;
@@ -39,6 +42,8 @@ const ReviewForm = ({
   ) => Promise<ActionResponse>;
   users: User[];
   testCases: TestCase[];
+  hideTestCaseSelect?: boolean;
+  hideComments?: boolean;
 }) => {
   const form = useForm({
     defaultValues: defaultValues ?? formOpts?.defaultValues,
@@ -75,40 +80,42 @@ const ReviewForm = ({
         form.handleSubmit();
       }}
     >
-      <form.Field
-        name="testCaseId"
-        validators={{
-          onChange: z.string().min(1, { message: "Test case is required" }),
-        }}
-      >
-        {(field) => {
-          return (
-            <div className="flex flex-col gap-2 mb-4 lg:w-1/3">
-              <Label htmlFor={field.name}>Test Case</Label>
-              <Select
-                onValueChange={(value) => field.handleChange(value)}
-                value={field.state.value}
-              >
-                <SelectTrigger id={field.name}>
-                  <SelectValue placeholder="Select a test case" />
-                </SelectTrigger>
-                <SelectContent>
-                  {testCases.map((testCase) => (
-                    <SelectItem key={testCase.id} value={testCase.id}>
-                      {testCase.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {field.state.meta.errors.map((error) => (
-                <p key={error as string} className="text-pink-500 text-xs">
-                  {error}
-                </p>
-              ))}
-            </div>
-          );
-        }}
-      </form.Field>
+      {!hideTestCaseSelect && (
+        <form.Field
+          name="testCaseId"
+          validators={{
+            onChange: z.string().min(1, { message: "Test case is required" }),
+          }}
+        >
+          {(field) => {
+            return (
+              <div className="flex flex-col gap-2 mb-4 lg:w-1/3">
+                <Label htmlFor={field.name}>Test Case</Label>
+                <Select
+                  onValueChange={(value) => field.handleChange(value)}
+                  value={field.state.value}
+                >
+                  <SelectTrigger id={field.name}>
+                    <SelectValue placeholder="Select a test case" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {testCases.map((testCase) => (
+                      <SelectItem key={testCase.id} value={testCase.id}>
+                        {testCase.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {field.state.meta.errors.map((error) => (
+                  <p key={error as string} className="text-pink-500 text-xs">
+                    {error}
+                  </p>
+                ))}
+              </div>
+            );
+          }}
+        </form.Field>
+      )}
       <form.Field
         name="reviewerId"
         validators={{
@@ -179,6 +186,27 @@ const ReviewForm = ({
           );
         }}
       </form.Field>
+      {!hideComments && (
+        <form.Field
+          name="comments"
+          validators={{
+            onChange: z.string().min(1, { message: "Comments are required" }),
+          }}
+        >
+          {(field) => {
+            return (
+              <div className="flex flex-col gap-2 mb-4 lg:w-1/3">
+                <Label htmlFor={field.name}>Comments</Label>
+                <Textarea
+                  id={field.name}
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              </div>
+            );
+          }}
+        </form.Field>
+      )}
       <form.Subscribe
         selector={(formState) => [formState.canSubmit, formState.isSubmitting]}
       >

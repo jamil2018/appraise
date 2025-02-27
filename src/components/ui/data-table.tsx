@@ -35,9 +35,9 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   filterColumn: string;
   filterPlaceholder: string;
-  createLink: string;
-  modifyLink: string;
-  deleteAction: (id: string[]) => Promise<ActionResponse>;
+  createLink?: string;
+  modifyLink?: string;
+  deleteAction?: (id: string[]) => Promise<ActionResponse>;
 }
 
 export function DataTable<TData, TValue>({
@@ -73,16 +73,18 @@ export function DataTable<TData, TValue>({
     const selectedIds = table
       .getSelectedRowModel()
       .rows.map((row) => (row.original as { id: string }).id);
-    const res = await deleteAction(selectedIds);
-    if (res.status === 200) {
-      toast({
-        title: "Test suite(s) deleted successfully",
-      });
-    } else {
-      toast({
-        title: "Error deleting test suite(s)",
-        description: res.message,
-      });
+    if (deleteAction) {
+      const res = await deleteAction(selectedIds);
+      if (res.status === 200) {
+        toast({
+          title: "Test suite(s) deleted successfully",
+        });
+      } else {
+        toast({
+          title: "Error deleting test suite(s)",
+          description: res.message,
+        });
+      }
     }
   };
 
@@ -90,40 +92,46 @@ export function DataTable<TData, TValue>({
     <div className="mb-10">
       <div className="flex justify-end">
         <div className="flex gap-2 mb-4">
-          <Button variant="outline" size="icon">
-            <Link href={createLink}>
-              <PlusCircle className="w-4 h-4" />
-            </Link>
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            disabled={
-              table.getSelectedRowModel().rows.length === 0 ||
-              table.getSelectedRowModel().rows.length > 1
-            }
-          >
-            <Link
-              href={`${modifyLink}/${
-                table.getSelectedRowModel().rows.length > 0
-                  ? (
-                      table.getSelectedRowModel().rows[0].original as {
-                        id: string;
-                      }
-                    ).id
-                  : ""
-              }`}
+          {createLink && (
+            <Button variant="outline" size="icon">
+              <Link href={createLink}>
+                <PlusCircle className="w-4 h-4" />
+              </Link>
+            </Button>
+          )}
+          {modifyLink && (
+            <Button
+              variant="outline"
+              size="icon"
+              disabled={
+                table.getSelectedRowModel().rows.length === 0 ||
+                table.getSelectedRowModel().rows.length > 1
+              }
             >
-              <Pencil className="w-4 h-4" />
-            </Link>
-          </Button>
-          <DeletePrompt
-            isDisabled={table.getSelectedRowModel().rows.length === 0}
-            dialogTitle="Delete Test Suite"
-            dialogDescription="Please confirm your action"
-            confirmationText="Are you sure you want to delete the selected test suite(s)?"
-            deleteHandler={deleteHandler}
-          />
+              <Link
+                href={`${modifyLink}/${
+                  table.getSelectedRowModel().rows.length > 0
+                    ? (
+                        table.getSelectedRowModel().rows[0].original as {
+                          id: string;
+                        }
+                      ).id
+                    : ""
+                }`}
+              >
+                <Pencil className="w-4 h-4" />
+              </Link>
+            </Button>
+          )}
+          {deleteAction && (
+            <DeletePrompt
+              isDisabled={table.getSelectedRowModel().rows.length === 0}
+              dialogTitle="Delete Test Suite"
+              dialogDescription="Please confirm your action"
+              confirmationText="Are you sure you want to delete the selected test suite(s)?"
+              deleteHandler={deleteHandler}
+            />
+          )}
         </div>
       </div>
       <div className="flex justify-between mb-4 items-center">
