@@ -67,44 +67,32 @@ model User {
 
 // Model for Test Cases
 model TestCase {
-  id                 String               @id @default(uuid())
-  title              String
-  description        String
-  steps              String[]
-  expectedOutcome    String
-  createdBy          String
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  creator            User                 @relation("TestCaseCreator", fields: [createdBy], references: [id])
-  reviews            Review[]
-  testRuns           TestRunTestCase[]
-  linkedJiraTickets  LinkedJiraTicket[]
-  TestSuiteTestCases TestSuiteTestCases[]
-  TestSuite          TestSuite[]          @relation("TestSuiteTestCases")
+  id                String             @id @default(uuid())
+  title             String
+  description       String
+  steps             String[]
+  expectedOutcome   String
+  createdBy         String
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  creator           User               @relation("TestCaseCreator", fields: [createdBy], references: [id])
+  reviews           Review[]
+  testRuns          TestRunTestCase[]
+  linkedJiraTickets LinkedJiraTicket[]
+  TestSuite         TestSuite[]        @relation("TestSuiteTestCases")
 }
 
 // Model for Test Suites
 model TestSuite {
-  id                 String               @id @default(uuid())
-  name               String
-  description        String?
-  createdBy          String
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  creator            User                 @relation(fields: [createdBy], references: [id])
-  testCases          TestCase[]           @relation("TestSuiteTestCases")
-  testRuns           TestRun[]
-  TestSuiteTestCases TestSuiteTestCases[]
-}
-
-// Model for the many-to-many relationship between Test Suites and Test Cases
-model TestSuiteTestCases {
-  testSuiteId String
-  testCaseId  String
-  testSuite   TestSuite @relation(fields: [testSuiteId], references: [id])
-  testCase    TestCase  @relation(fields: [testCaseId], references: [id])
-
-  @@id([testSuiteId, testCaseId])
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  createdBy   String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  creator     User       @relation(fields: [createdBy], references: [id])
+  testCases   TestCase[] @relation("TestSuiteTestCases")
+  testRuns    TestRun[]
 }
 
 // Model for Reviews
@@ -137,10 +125,11 @@ model LinkedJiraTicket {
 // Model for Test Runs
 model TestRun {
   id            String            @id @default(uuid())
+  name          String
   testSuiteId   String
   executedBy    String
   status        TestRunStatus
-  executionTime Int?
+  executionTime String?
   comments      String?
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt

@@ -2,6 +2,7 @@ import PageHeader from "@/components/typography/page-header";
 import HeaderSubtitle from "@/components/typography/page-header-subtitle";
 import { BookOpenCheck } from "lucide-react";
 import React from "react";
+import TestRunTable from "./test-run-table";
 
 const TestRuns = () => {
   return (
@@ -18,6 +19,7 @@ const TestRuns = () => {
           feature or functionality
         </HeaderSubtitle>
       </div>
+      <TestRunTable />
     </>
   );
 };
