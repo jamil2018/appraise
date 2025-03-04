@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { MoreHorizontal, Pencil, Trash } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash, Eye } from "lucide-react";
 import { Button } from "../ui/button";
 import Link from "next/link";
 
@@ -19,10 +19,13 @@ import { toast } from "@/hooks/use-toast";
 const TableActions = ({
   modifyLink,
   deleteHandler,
+  viewLink,
+  viewActionText = "View",
   editActionText = "Edit",
   deleteActionText = "Delete",
   editActionIcon = <Pencil className="h-4 w-4" />,
   deleteActionIcon = <Trash className="h-4 w-4" />,
+  viewActionIcon = <Eye className="h-4 w-4" />,
 }: {
   modifyLink: string;
   deleteHandler: () => Promise<ActionResponse>;
@@ -30,6 +33,9 @@ const TableActions = ({
   deleteActionText?: string;
   editActionIcon?: React.ReactNode;
   deleteActionIcon?: React.ReactNode;
+  viewActionText?: string;
+  viewActionIcon?: React.ReactNode;
+  viewLink?: string;
 }) => {
   return (
     <>
@@ -43,6 +49,15 @@ const TableActions = ({
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator />
+          {viewLink && (
+            <DropdownMenuItem>
+              <Link href={viewLink}>
+                <span className="flex items-center gap-2">
+                  {viewActionIcon} {viewActionText}
+                </span>
+              </Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem>
             <Link href={modifyLink}>
               <span className="flex items-center gap-2">

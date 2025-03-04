@@ -45,7 +45,10 @@ enum TestCaseStatus {
 enum TestCaseResult {
   PASSED
   FAILED
-  COULD_NOT_COMPLETE
+  BLOCKED
+  SKIPPED
+  RETEST
+  UNTESTED
 }
 
 // Model for Users

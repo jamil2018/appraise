@@ -17,3 +17,10 @@ export async function comparePassword(
 ) {
   return await bcrypt.compare(password, hashedPassword);
 }
+
+export function calculateCompletionPercentage(
+  total: number,
+  completed: number
+) {
+  return Math.round((completed / total) * 100);
+}

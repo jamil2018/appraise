@@ -1,7 +1,7 @@
 import {
   getTestRunsAction,
   deleteTestRunAction,
-  TestRunWithRelations,
+  TestRunsWithRelations,
 } from "@/actions/test-run/test-run-actions";
 import { DataTable } from "@/components/ui/data-table";
 import { testRunTableCols } from "./test-run-table-columns";
@@ -12,7 +12,7 @@ const TestRunTable = async () => {
     <>
       <DataTable
         columns={testRunTableCols}
-        data={testRuns as TestRunWithRelations[]}
+        data={testRuns as TestRunsWithRelations[]}
         filterColumn="name"
         filterPlaceholder="Filter by name..."
         createLink="/test-runs/create"

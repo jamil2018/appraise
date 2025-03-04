@@ -6,10 +6,10 @@ import { DataTableColumnHeader } from "@/components/ui/data-table-column-header"
 import TableActions from "@/components/table/table-actions";
 import {
   deleteTestRunAction,
-  TestRunWithRelations,
+  TestRunsWithRelations,
 } from "@/actions/test-run/test-run-actions";
 
-export const testRunTableCols: ColumnDef<TestRunWithRelations>[] = [
+export const testRunTableCols: ColumnDef<TestRunsWithRelations>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -91,6 +91,7 @@ export const testRunTableCols: ColumnDef<TestRunWithRelations>[] = [
         <TableActions
           modifyLink={`/test-runs/modify/${review.id}`}
           deleteHandler={() => deleteTestRunAction([review.id])}
+          viewLink={`/test-runs/view/${review.id}`}
         />
       );
     },
