@@ -29,6 +29,7 @@ import Link from "next/link";
 import { toast } from "@/hooks/use-toast";
 import { ActionResponse } from "@/types/form/actionHandler";
 import DeletePrompt from "../user-prompt/delete-prompt";
+import { randomBytes } from "crypto";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -66,6 +67,9 @@ export function DataTable<TData, TValue>({
       sorting,
       columnFilters,
       rowSelection,
+    },
+    getRowId: () => {
+      return randomBytes(16).toString("hex");
     },
   });
 

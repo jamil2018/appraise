@@ -2,7 +2,14 @@
 
 import prisma from "@/config/db-config";
 import { ActionResponse } from "@/types/form/actionHandler";
-import { TestCaseStatus, TestRun, TestRunStatus } from "@prisma/client";
+import {
+  TestCaseStatus,
+  TestCaseResult,
+  TestRun,
+  TestRunStatus,
+  TestRunTestCase,
+} from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 export interface TestRunsWithRelations extends TestRun {
   testSuite: {
@@ -10,6 +17,13 @@ export interface TestRunsWithRelations extends TestRun {
   };
   executor: {
     username: string;
+  };
+}
+
+export interface TestRunTestCases extends TestRunTestCase {
+  testCase: {
+    title: string;
+    expectedOutcome: string;
   };
 }
 
@@ -151,6 +165,90 @@ export async function getTestRunAction(id: string): Promise<ActionResponse> {
         testRun,
         testRunTestCases,
       },
+    };
+  } catch (error) {
+    return {
+      status: 500,
+      error: `Server error occurred: ${error}`,
+    };
+  }
+}
+
+export async function getTestRunTestCasesAction(
+  testRunId: string
+): Promise<ActionResponse> {
+  const testRunTestCases = await prisma.testRunTestCase.findMany({
+    where: {
+      testRunId,
+    },
+    include: {
+      testCase: {
+        select: {
+          title: true,
+          expectedOutcome: true,
+        },
+      },
+    },
+  });
+  return {
+    status: 200,
+    data: testRunTestCases as TestRunTestCases[],
+  };
+}
+
+export async function updateTestRunTestCaseAction(
+  testRunId: string,
+  testCaseId: string,
+  data: {
+    status?: TestCaseStatus;
+    result?: TestCaseResult;
+    executionTime?: number;
+    comments?: string;
+  }
+): Promise<ActionResponse> {
+  try {
+    const dataToUpdate: {
+      status?: TestCaseStatus;
+      result?: TestCaseResult;
+      executionTime?: number;
+      comments?: string;
+    } = {};
+
+    if (data.status) {
+      dataToUpdate.status = data.status;
+    }
+    if (data.result) {
+      dataToUpdate.result = data.result;
+    }
+    if (data.executionTime) {
+      dataToUpdate.executionTime = data.executionTime;
+    }
+    if (data.comments) {
+      dataToUpdate.comments = data.comments;
+    }
+
+    if (
+      data.status === undefined &&
+      data.result === undefined &&
+      data.executionTime === undefined &&
+      data.comments === undefined
+    ) {
+      return {
+        status: 400,
+        error: "No data to update",
+      };
+    }
+
+    const updatedTestRunTestCase = await prisma.testRunTestCase.update({
+      where: { testRunId_testCaseId: { testRunId, testCaseId } },
+      data: dataToUpdate,
+    });
+
+    revalidatePath("/test-runs");
+
+    return {
+      status: 200,
+      data: updatedTestRunTestCase,
     };
   } catch (error) {
     return {

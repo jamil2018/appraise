@@ -1,3 +1,6 @@
+export const fetchCache = "force-no-store"; // Ensures fresh data
+export const dynamic = "force-dynamic"; // Forces re-fetching
+
 import PageHeader from "@/components/typography/page-header";
 import React from "react";
 import {
@@ -10,6 +13,9 @@ import HeaderSubtitle from "@/components/typography/page-header-subtitle";
 import InfoCard from "@/components/data-visualization/info-card";
 import { TestCaseResult, TestCaseStatus } from "@prisma/client";
 import PieChartGraph from "@/components/chart/pie-chart";
+import TestRunTestCasesTable from "../../test-run-test-cases-table";
+import Loading from "@/components/ui/loading";
+import { Suspense } from "react";
 
 const ViewTestRun = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
@@ -128,6 +134,14 @@ const ViewTestRun = async ({ params }: { params: Promise<{ id: string }> }) => {
             icon={<BookOpenCheck className="w-4 h-4" />}
           />
         </div>
+      </div>
+
+      {/* Test cases table */}
+      <div className="mt-8">
+        <h3 className="text-lg font-bold">Test Cases</h3>
+        <Suspense fallback={<Loading />}>
+          <TestRunTestCasesTable testRunId={id} />
+        </Suspense>
       </div>
     </>
   );
