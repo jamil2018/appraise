@@ -1,6 +1,6 @@
 import React from "react";
 
-const CreateTestRun = () => {
+const CreateTestRun = async () => {
   return <div>CreateTestRun</div>;
 };
 

@@ -8,7 +8,7 @@ import {
   TestRunTestCases,
   updateTestRunTestCaseAction,
 } from "@/actions/test-run/test-run-actions";
-import { TestCaseStatus } from "@prisma/client";
+import { TestCaseResult, TestCaseStatus } from "@prisma/client";
 import {
   Select,
   SelectContent,
@@ -93,6 +93,35 @@ export const testRunTestCasesTableCols: ColumnDef<TestRunTestCases>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Result" />
     ),
+    cell: ({ row }) => {
+      const result = row.original.result as TestCaseResult;
+      return (
+        <Select
+          defaultValue={result}
+          onValueChange={(value) => {
+            updateTestRunTestCaseAction(
+              row.original.testRunId,
+              row.original.testCaseId,
+              {
+                result: value as TestCaseResult,
+              }
+            );
+          }}
+        >
+          <SelectTrigger className="w-36">
+            <SelectValue placeholder={result} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={TestCaseResult.PASSED}>Passed</SelectItem>
+            <SelectItem value={TestCaseResult.FAILED}>Failed</SelectItem>
+            <SelectItem value={TestCaseResult.SKIPPED}>Skipped</SelectItem>
+            <SelectItem value={TestCaseResult.BLOCKED}>Blocked</SelectItem>
+            <SelectItem value={TestCaseResult.RETEST}>Retest</SelectItem>
+            <SelectItem value={TestCaseResult.UNTESTED}>Untested</SelectItem>
+          </SelectContent>
+        </Select>
+      );
+    },
   },
   {
     accessorKey: "executionTime",
