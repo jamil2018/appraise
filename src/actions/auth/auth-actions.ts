@@ -16,11 +16,18 @@ export const signInAction = async (
   formData?: FormData
 ): Promise<ActionResponse> => {
   try {
-    const result = await signIn(provider, formData);
+    const result: { email: string } = await signIn(provider, formData);
+    console.log("signInAction");
     console.log(result);
+    if (result.email) {
+      return {
+        status: 200,
+        message: "User signed in successfully",
+      };
+    }
     return {
-      status: 200,
-      message: "User signed in successfully",
+      status: 401,
+      message: "Invalid credentials",
     };
   } catch (error) {
     if (isRedirectError(error)) {

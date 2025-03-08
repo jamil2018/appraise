@@ -48,8 +48,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (!isPasswordValid) {
             throw new Error("Invalid password");
           }
-          console.log("user object");
-          console.log(user);
           return {
             id: user.id,
             email: user.email,
@@ -68,6 +66,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.id = token.sub as string;
       session.user.role = token.role as string;
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) return `${baseUrl}/dashboard`;
+      if (new URL(url).origin === baseUrl) return `${baseUrl}/dashboard`;
+      return baseUrl;
     },
   },
 });

@@ -1,6 +1,7 @@
 import React from "react";
 import PageHeader from "@/components/typography/page-header";
 import HeaderSubtitle from "@/components/typography/page-header-subtitle";
+import FlowDiagram from "@/components/data-visualization/flow-diagram";
 
 const Dashboard = () => {
   return (
@@ -12,6 +13,7 @@ const Dashboard = () => {
           them.
         </HeaderSubtitle>
       </div>
+      <FlowDiagram />
     </div>
   );
 };

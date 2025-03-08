@@ -25,6 +25,7 @@
     "@radix-ui/react-tooltip": "^1.1.8",
     "@tanstack/react-form": "^0.41.3",
     "@tanstack/react-table": "^8.20.6",
+    "@xyflow/react": "^12.4.4",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

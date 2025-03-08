@@ -92,7 +92,10 @@ const Login = async () => {
               <Form
                 action={async (formData) => {
                   "use server";
-                  await signInAction("credentials", formData);
+                  const res = await signInAction("credentials", formData);
+                  if (res.status === 200) {
+                    console.log("successful login");
+                  }
                 }}
                 className="flex flex-col gap-4"
               >
