@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,35 +7,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Enum for user roles
 enum Role {
   ADMIN
   TESTER
   REVIEWER
 }
 
-// Enum for review statuses
 enum ReviewStatus {
   PENDING
   APPROVED
   CHANGES_REQUESTED
 }
 
-// Enum for test run statuses
 enum TestRunStatus {
   IN_PROGRESS
   COMPLETED
   CANCELLED
 }
 
-// Enum for test case statuses inside a test run
 enum TestCaseStatus {
   PENDING
   IN_PROGRESS
   COMPLETED
 }
 
-// Enum for test case results inside a test run
 enum TestCaseResult {
   PASSED
   FAILED
@@ -51,7 +40,12 @@ enum TestCaseResult {
   UNTESTED
 }
 
-// Model for Users
+enum TestCaseTemplateStepType {
+  ACTION
+  ASSERTION
+  FLOW_CONTROL
+}
+
 model User {
   id             String      @id @default(uuid())
   username       String      @unique
@@ -68,24 +62,21 @@ model User {
   createdReviews Review[]    @relation("ReviewCreator")
 }
 
-// Model for Test Cases
 model TestCase {
-  id                String             @id @default(uuid())
+  id                String                 @id @default(uuid())
   title             String
   description       String
-  steps             String[]
-  expectedOutcome   String
   createdBy         String
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  creator           User               @relation("TestCaseCreator", fields: [createdBy], references: [id])
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  creator           User                   @relation("TestCaseCreator", fields: [createdBy], references: [id])
   reviews           Review[]
   testRuns          TestRunTestCase[]
   linkedJiraTickets LinkedJiraTicket[]
-  TestSuite         TestSuite[]        @relation("TestSuiteTestCases")
+  TestSuite         TestSuite[]            @relation("TestSuiteTestCases")
+  steps             TestCaseTemplateStep[]
 }
 
-// Model for Test Suites
 model TestSuite {
   id          String     @id @default(uuid())
   name        String
@@ -98,7 +89,6 @@ model TestSuite {
   testRuns    TestRun[]
 }
 
-// Model for Reviews
 model Review {
   id         String       @id @default(uuid())
   testCaseId String
@@ -113,7 +103,6 @@ model Review {
   createdBy  String
 }
 
-// Model for Linked Jira Tickets
 model LinkedJiraTicket {
   id            String   @id @default(uuid())
   testCaseId    String
@@ -125,7 +114,6 @@ model LinkedJiraTicket {
   testCase      TestCase @relation(fields: [testCaseId], references: [id])
 }
 
-// Model for Test Runs
 model TestRun {
   id            String            @id @default(uuid())
   name          String
@@ -141,12 +129,11 @@ model TestRun {
   testCases     TestRunTestCase[]
 }
 
-// Model for the many-to-many relationship between Test Runs and Test Cases
 model TestRunTestCase {
   testRunId     String
   testCaseId    String
-  status        TestCaseStatus // New field for tracking test case execution status
-  result        TestCaseResult? // Updated to use an enum instead of a string
+  status        TestCaseStatus
+  result        TestCaseResult?
   executionTime Int?
   comments      String?
   testRun       TestRun         @relation(fields: [testRunId], references: [id])
@@ -155,7 +142,6 @@ model TestRunTestCase {
   @@id([testRunId, testCaseId])
 }
 
-// Model for User Roles
 model UserRole {
   id        String   @id @default(uuid())
   userId    String
@@ -163,4 +149,25 @@ model UserRole {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model TemplateStep {
+  id                    String                   @id @default(uuid())
+  name                  String // e.g., "Click Element", "Enter Text"
+  description           String?
+  type                  TestCaseTemplateStepType
+  parameters            Json // Stores necessary values (selectors, inputs, etc.)
+  signature             String
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+  testCaseTemplateSteps TestCaseTemplateStep[]
+}
+
+model TestCaseTemplateStep {
+  id             String       @id @default(uuid())
+  testCaseId     String
+  testCase       TestCase     @relation(fields: [testCaseId], references: [id])
+  templateStepId String
+  templateStep   TemplateStep @relation(fields: [templateStepId], references: [id])
+  order          Int // Determined by React Flow
 }
