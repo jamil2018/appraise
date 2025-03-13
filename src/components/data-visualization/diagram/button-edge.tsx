@@ -39,7 +39,7 @@ export default function ButtonEdge({
       <BaseEdge path={edgePath} markerEnd={markerEnd} style={style} />
       <EdgeLabelRenderer>
         <div
-          className="absolute flex items-center justify-center pointer-events-auto nodrag nopan"
+          className={`absolute flex items-center justify-center pointer-events-auto nodrag nopan`}
           style={{
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
           }}

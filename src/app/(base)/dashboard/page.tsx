@@ -3,27 +3,49 @@ import PageHeader from "@/components/typography/page-header";
 import HeaderSubtitle from "@/components/typography/page-header-subtitle";
 import FlowDiagram from "@/components/data-visualization/diagram/flow-diagram";
 import { Edge, Node } from "@xyflow/react";
+import { Check, MousePointerClick, Keyboard } from "lucide-react";
 
 const initialNodes: Node[] = [
   {
     id: "1",
-    data: { label: "Node 1", name: "Click" },
+    data: {
+      label: "Click",
+      description: "Click on element",
+      isFirstNode: true,
+      icon: <MousePointerClick />,
+    },
     position: { x: 100, y: 0 },
+    type: "optionsHeaderNode",
   },
   {
     id: "2",
-    data: { label: "Node 2", name: "Click" },
-    position: { x: 100, y: 100 },
+    data: {
+      label: "Input",
+      description: "Fill in input field",
+      icon: <Keyboard />,
+    },
+    position: { x: 300, y: 0 },
+    type: "optionsHeaderNode",
   },
   {
     id: "3",
-    data: { label: "Node 3", name: "Click" },
-    position: { x: 100, y: 200 },
+    data: {
+      label: "Click",
+      description: "Click on element",
+      icon: <MousePointerClick />,
+    },
+    position: { x: 500, y: 0 },
+    type: "optionsHeaderNode",
   },
   {
     id: "4",
-    data: { label: "Node 4", name: "Click" },
-    position: { x: 100, y: 300 },
+    data: {
+      label: "Validate",
+      description: "Validate element contains expected text",
+      icon: <Check />,
+    },
+    position: { x: 700, y: 0 },
+    type: "optionsHeaderNode",
   },
 ];
 

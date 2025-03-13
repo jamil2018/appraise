@@ -21,9 +21,13 @@ import { DialogClose } from "@/components/ui/dialog";
 import { DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Dialog, DialogHeader } from "@/components/ui/dialog";
 import { DialogContent } from "@/components/ui/dialog";
+import OptionsHeaderNode from "./options-header-node";
 
 const edgeTypes = {
   buttonEdge: ButtonEdge,
+};
+const nodeTypes = {
+  optionsHeaderNode: OptionsHeaderNode,
 };
 
 const FlowDiagram = ({
@@ -47,6 +51,7 @@ const FlowDiagram = ({
       id: crypto.randomUUID(),
       data: { label: `Node new` },
       position: { x: 0, y: 0 },
+      type: "OptionsHeaderNode",
     };
     setNodes((nds) => nds.concat(newNode));
     setShowAddNodeDialog(false);
@@ -73,6 +78,7 @@ const FlowDiagram = ({
           colorMode="dark"
           connectionMode={ConnectionMode.Loose}
           edgeTypes={edgeTypes}
+          nodeTypes={nodeTypes}
           defaultEdgeOptions={{
             type: "buttonEdge",
           }}
