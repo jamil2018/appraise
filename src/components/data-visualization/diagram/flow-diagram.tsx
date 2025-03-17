@@ -11,8 +11,9 @@ import {
   ReactFlow,
   useEdgesState,
   useNodesState,
+  Connection,
 } from "@xyflow/react";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useMemo } from "react";
 import "@xyflow/react/dist/style.css";
 import { Button } from "../../ui/button";
 import ButtonEdge from "./button-edge";
@@ -22,6 +23,7 @@ import { DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Dialog, DialogHeader } from "@/components/ui/dialog";
 import { DialogContent } from "@/components/ui/dialog";
 import OptionsHeaderNode from "./options-header-node";
+import { NodeOrderMap } from "@/types/diagram/diagram";
 
 const edgeTypes = {
   buttonEdge: ButtonEdge,
@@ -31,16 +33,81 @@ const nodeTypes = {
 };
 
 const FlowDiagram = ({
-  initialNodes,
-  initialEdges,
+  nodeOrder,
+  onNodeOrderChange,
 }: {
-  initialNodes: Node[];
-  initialEdges: Edge[];
+  nodeOrder: NodeOrderMap;
+  onNodeOrderChange: (nodeOrder: NodeOrderMap) => void;
 }) => {
+  const generateInitialNodesAndEdges = useCallback(
+    (nodeOrder: NodeOrderMap) => {
+      const nodes: Node[] = [];
+      const edges: Edge[] = [];
+
+      // Sort entries by order value
+      const sortedEntries = Object.entries(nodeOrder).sort(
+        ([, nodeDataA], [, nodeDataB]) => nodeDataA.order - nodeDataB.order
+      );
+
+      // Create nodes
+      sortedEntries.forEach(([id, nodeData], index) => {
+        const baseNodeData = {
+          label: nodeData.label,
+          description: nodeData.description || "",
+          isFirstNode: nodeData.isFirstNode || false,
+          icon: nodeData.icon || "",
+        };
+
+        // Skip isolated nodes (order === -1)
+        if (nodeData.order === -1) {
+          nodes.push({
+            id,
+            data: baseNodeData,
+            position: { x: 0, y: index * 100 }, // Stack isolated nodes vertically
+            type: "optionsHeaderNode",
+          });
+          return;
+        }
+
+        nodes.push({
+          id,
+          data: baseNodeData,
+          position: { x: nodeData.order * 500, y: 0 }, // Space nodes horizontally based on order
+          type: "optionsHeaderNode",
+        });
+
+        // Create edges between consecutive nodes
+        if (index < sortedEntries.length - 1) {
+          const nextEntry = sortedEntries[index + 1];
+          // Only create edge if both nodes have valid orders (not -1)
+          if (
+            nodeData.order !== -1 &&
+            nextEntry[1].order !== -1 &&
+            nodeData.order === nextEntry[1].order - 1
+          ) {
+            edges.push({
+              id: `${id}-${nextEntry[0]}`,
+              source: id,
+              target: nextEntry[0],
+              type: "buttonEdge",
+            });
+          }
+        }
+      });
+
+      return { nodes, edges };
+    },
+    []
+  );
+
+  const { nodes: initialNodes, edges: initialEdges } = useMemo(
+    () => generateInitialNodesAndEdges(nodeOrder),
+    [nodeOrder, generateInitialNodesAndEdges]
+  );
+
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [showAddNodeDialog, setShowAddNodeDialog] = useState(false);
-  const [nodeOrders, setNodeOrders] = useState<Record<string, number>>({});
 
   const determineNodeOrders = useCallback((nodes: Node[], edges: Edge[]) => {
     // Create adjacency list
@@ -76,20 +143,33 @@ const FlowDiagram = ({
       .map((node) => node.id)
       .filter((id) => inDegree[id] === 0 && hasConnections[id]);
 
-    const orders: Record<string, number> = {};
-    let order = 1;
+    const orders: NodeOrderMap = {};
+    let orderNum = 1;
 
     // First mark all isolated nodes with -1
     nodes.forEach((node) => {
       if (!hasConnections[node.id]) {
-        orders[node.id] = -1;
+        orders[node.id] = {
+          order: -1,
+          label: node.data.label as string,
+          description: node.data.description as string | undefined,
+          isFirstNode: node.data.isFirstNode as boolean | undefined,
+          icon: node.data.icon as React.ReactNode | undefined,
+        };
       }
     });
 
     // Process queue
     while (queue.length > 0) {
       const currentId = queue.shift()!;
-      orders[currentId] = order++;
+      const currentNode = nodes.find((node) => node.id === currentId)!;
+      orders[currentId] = {
+        order: orderNum++,
+        label: currentNode.data.label as string,
+        description: currentNode.data.description as string | undefined,
+        isFirstNode: currentNode.data.isFirstNode as boolean | undefined,
+        icon: currentNode.data.icon as React.ReactNode | undefined,
+      };
 
       // Process neighbors
       graph[currentId].forEach((neighborId) => {
@@ -103,7 +183,13 @@ const FlowDiagram = ({
     // Handle any remaining nodes (cycles)
     nodes.forEach((node) => {
       if (!orders[node.id]) {
-        orders[node.id] = order++;
+        orders[node.id] = {
+          order: orderNum++,
+          label: node.data.label as string,
+          description: node.data.description as string | undefined,
+          isFirstNode: node.data.isFirstNode as boolean | undefined,
+          icon: node.data.icon as React.ReactNode | undefined,
+        };
       }
     });
 
@@ -112,13 +198,33 @@ const FlowDiagram = ({
 
   useEffect(() => {
     const orders = determineNodeOrders(nodes, edges);
-    setNodeOrders(orders);
-    console.log("Node orders:", orders);
-  }, [nodes, edges, determineNodeOrders]);
+    onNodeOrderChange(orders);
+  }, [nodes, edges, determineNodeOrders, onNodeOrderChange]);
+
+  const isValidConnection = useCallback(
+    (connection: Connection | Edge) => {
+      // Check if source node already has an outgoing connection
+      const hasSourceConnection = edges.some(
+        (edge) => edge.source === connection.source
+      );
+
+      // Check if target node already has an incoming connection
+      const hasTargetConnection = edges.some(
+        (edge) => edge.target === connection.target
+      );
+
+      return !hasSourceConnection && !hasTargetConnection;
+    },
+    [edges]
+  );
 
   const onConnect: OnConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
+    (params) => {
+      if (isValidConnection(params)) {
+        setEdges((eds) => addEdge(params, eds));
+      }
+    },
+    [setEdges, isValidConnection]
   );
 
   const addNode = useCallback(() => {
@@ -132,7 +238,6 @@ const FlowDiagram = ({
     setShowAddNodeDialog(false);
   }, [setNodes, setShowAddNodeDialog]);
 
-  console.log(nodeOrders);
   return (
     <>
       <div className="w-full h-[500px]">
@@ -158,6 +263,8 @@ const FlowDiagram = ({
           defaultEdgeOptions={{
             type: "buttonEdge",
           }}
+          connectOnClick={false}
+          isValidConnection={isValidConnection}
         >
           <Background />
           <Controls />

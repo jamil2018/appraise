@@ -1,61 +1,53 @@
-import React from "react";
+"use client";
+import React, { useState, useCallback } from "react";
 import PageHeader from "@/components/typography/page-header";
 import HeaderSubtitle from "@/components/typography/page-header-subtitle";
 import FlowDiagram from "@/components/data-visualization/diagram/flow-diagram";
-import { Edge, Node } from "@xyflow/react";
-import { Check, MousePointerClick, Keyboard } from "lucide-react";
+import { MousePointerClick } from "lucide-react";
+import { Globe, Keyboard } from "lucide-react";
+import { NodeOrderMap } from "@/types/diagram/diagram";
 
-const initialNodes: Node[] = [
-  {
-    id: "1",
-    data: {
-      label: "Click",
-      description: "Click on element",
-      isFirstNode: true,
-      icon: <MousePointerClick />,
-    },
-    position: { x: 100, y: 0 },
-    type: "optionsHeaderNode",
+const initialNodesOrder = {
+  "1": {
+    order: 0,
+    label: "Navigate",
+    description: "Navigate to the login page",
+    isFirstNode: true,
+    icon: <Globe />,
   },
-  {
-    id: "2",
-    data: {
-      label: "Input",
-      description: "Fill in input field",
-      icon: <Keyboard />,
-    },
-    position: { x: 300, y: 0 },
-    type: "optionsHeaderNode",
+  "2": {
+    order: 1,
+    label: "Input",
+    description: "Fill in the username field with value 'admin'",
+    isFirstNode: false,
+    icon: <Keyboard />,
   },
-  {
-    id: "3",
-    data: {
-      label: "Click",
-      description: "Click on element",
-      icon: <MousePointerClick />,
-    },
-    position: { x: 500, y: 0 },
-    type: "optionsHeaderNode",
+  "3": {
+    order: 2,
+    label: "Input",
+    description: "Fill in the password field with value 'password'",
+    isFirstNode: false,
+    icon: <Keyboard />,
   },
-  {
-    id: "4",
-    data: {
-      label: "Validate",
-      description: "Validate element contains expected text",
-      icon: <Check />,
-    },
-    position: { x: 700, y: 0 },
-    type: "optionsHeaderNode",
+  "4": {
+    order: 3,
+    label: "Click",
+    description: "Click the login button",
+    isFirstNode: false,
+    icon: <MousePointerClick />,
   },
-];
-
-const initialEdges: Edge[] = [
-  { id: "e1-2", source: "1", target: "2", type: "buttonEdge" },
-  { id: "e2-3", source: "2", target: "3", type: "buttonEdge" },
-  { id: "e3-4", source: "3", target: "4", type: "buttonEdge" },
-];
+};
 
 const Dashboard = () => {
+  const [nodesOrder, setNodesOrder] = useState<NodeOrderMap>({});
+
+  const handleNodeOrderChange = useCallback(
+    (nodeOrder: NodeOrderMap) => {
+      setNodesOrder(nodeOrder);
+    },
+    [setNodesOrder]
+  );
+  console.log("nodesOrder:", nodesOrder);
   return (
     <div>
       <div className="mb-8">
@@ -65,7 +57,10 @@ const Dashboard = () => {
           them.
         </HeaderSubtitle>
       </div>
-      <FlowDiagram initialNodes={initialNodes} initialEdges={initialEdges} />
+      <FlowDiagram
+        nodeOrder={initialNodesOrder}
+        onNodeOrderChange={handleNodeOrderChange}
+      />
     </div>
   );
 };
