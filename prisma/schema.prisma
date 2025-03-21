@@ -46,6 +46,13 @@ enum TestCaseTemplateStepType {
   FLOW_CONTROL
 }
 
+enum ParamType {
+  NUMBER
+  STRING
+  DATE
+  BOOLEAN
+}
+
 model User {
   id             String      @id @default(uuid())
   username       String      @unique
@@ -156,11 +163,22 @@ model TemplateStep {
   name                  String // e.g., "Click Element", "Enter Text"
   description           String?
   type                  TestCaseTemplateStepType
-  parameters            Json // Stores necessary values (selectors, inputs, etc.)
+  parameters            TemplateStepParameter[]
   signature             String
   createdAt             DateTime                 @default(now())
   updatedAt             DateTime                 @updatedAt
   testCaseTemplateSteps TestCaseTemplateStep[]
+}
+
+model TemplateStepParameter {
+  id             String       @id @default(uuid())
+  name           String
+  type           ParamType
+  order          Int
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  templateStep   TemplateStep @relation(fields: [templateStepId], references: [id])
+  templateStepId String
 }
 
 model TestCaseTemplateStep {

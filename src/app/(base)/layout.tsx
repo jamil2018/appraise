@@ -43,6 +43,9 @@ export default function BaseLayout({
             <NavigationMenuItem>
               <NavLink href="/settings">Settings</NavLink>
             </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavLink href="/template-steps">Template Steps</NavLink>
+            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
       </nav>
