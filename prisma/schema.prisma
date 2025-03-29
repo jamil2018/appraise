@@ -165,6 +165,7 @@ model TemplateStep {
   type                  TestCaseTemplateStepType
   parameters            TemplateStepParameter[]
   signature             String
+  functionDefinition    String?
   createdAt             DateTime                 @default(now())
   updatedAt             DateTime                 @updatedAt
   testCaseTemplateSteps TestCaseTemplateStep[]

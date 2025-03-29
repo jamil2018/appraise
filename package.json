@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@babel/parser": "^7.27.0",
+    "@babel/types": "^7.27.0",
     "@prisma/client": "^6.2.1",
     "@radix-ui/react-alert-dialog": "^1.1.6",
     "@radix-ui/react-avatar": "^1.1.2",
@@ -25,17 +27,21 @@
     "@radix-ui/react-tooltip": "^1.1.8",
     "@tanstack/react-form": "^0.41.3",
     "@tanstack/react-table": "^8.20.6",
+    "@uiw/codemirror-extensions-langs": "^4.23.10",
+    "@uiw/codemirror-theme-github": "^4.23.10",
+    "@uiw/react-codemirror": "^4.23.10",
     "@xyflow/react": "^12.4.4",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "lucide-react": "^0.473.0",
-    "next": "15.1.5",
+    "next": "15.2.4",
     "next-auth": "^5.0.0-beta.25",
     "next-themes": "^0.4.4",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "prettier": "^3.5.3",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
     "recharts": "^2.15.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
@@ -45,10 +51,10 @@
     "@eslint/eslintrc": "^3",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.17.16",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "19.0.12",
+    "@types/react-dom": "19.0.4",
     "eslint": "^9",
-    "eslint-config-next": "15.1.5",
+    "eslint-config-next": "15.2.4",
     "postcss": "^8",
     "prisma": "^6.2.1",
     "tailwindcss": "^3.4.1",
@@ -56,6 +62,8 @@
     "typescript": "^5.7.3"
   },
   "overrides": {
-    "react-is": "^19.0.0"
+    "react-is": "^19.0.0",
+    "@types/react": "19.0.12",
+    "@types/react-dom": "19.0.4"
   }
 }
