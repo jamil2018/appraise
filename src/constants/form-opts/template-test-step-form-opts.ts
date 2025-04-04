@@ -8,6 +8,13 @@ export const templateStepSchema = z.object({
   type: z.string(),
   signature: z.string(),
   functionDefinition: z.string().optional(),
+  params: z.array(
+    z.object({
+      name: z.string(),
+      type: z.string(),
+      order: z.number(),
+    })
+  ),
 });
 
 export type TemplateStep = z.infer<typeof templateStepSchema>;
@@ -19,5 +26,6 @@ export const formOpts = formOptions({
     type: "ACTION",
     signature: "",
     functionDefinition: "",
+    params: [],
   } as TemplateStep,
 });

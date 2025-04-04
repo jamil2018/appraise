@@ -16,7 +16,11 @@ import {
 } from "@/constants/form-opts/template-test-step-form-opts";
 import { toast } from "@/hooks/use-toast";
 import { ActionResponse } from "@/types/form/actionHandler";
-import { TestCaseTemplateStepType } from "@prisma/client";
+import {
+  ParamType,
+  TestCaseTemplateStepType,
+  TemplateStepParameter,
+} from "@prisma/client";
 import { useForm } from "@tanstack/react-form";
 import { ServerFormState, initialFormState } from "@tanstack/react-form/nextjs";
 import { z } from "zod";
@@ -28,8 +32,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import prettier from "prettier/standalone";
 import parserTypescript from "prettier/parser-typescript";
 import estreePlugin from "prettier/plugins/estree";
+import ParamChip from "./paramChip";
 
-let defaultFunctionDefinition = `When('',async function(this:World){//your template step code here});`;
+let defaultFunctionDefinition = `When('test', async function(this:World){});`;
 
 export const TemplateStepForm = ({
   defaultValues,
@@ -69,34 +74,36 @@ export const TemplateStepForm = ({
     (defaultValues?.type as TestCaseTemplateStepType) ??
       TestCaseTemplateStepType.ACTION
   );
+  const [params, setParams] = useState<TemplateStepParameter[]>(
+    (defaultValues?.params as TemplateStepParameter[]) ?? []
+  );
 
   const form = useForm({
     defaultValues: defaultValues ?? formOpts?.defaultValues,
     validators: formOpts?.validators,
     onSubmit: async ({ value }) => {
       value.functionDefinition = functionDefinition;
-      console.log(value);
-      // const res = await onSubmitAction(initialFormState, value, id);
-      // if (res.status === 200) {
-      //   toast({
-      //     title: successTitle,
-      //     description: successMessage,
-      //   });
-      // }
-      // if (res.status === 400) {
-      //   toast({
-      //     title: "Error",
-      //     description: res.error,
-      //     variant: "destructive",
-      //   });
-      // }
-      // if (res.status === 500) {
-      //   toast({
-      //     title: "Error",
-      //     description: res.error,
-      //     variant: "destructive",
-      //   });
-      // }
+      const res = await onSubmitAction(initialFormState, value, id);
+      if (res.status === 200) {
+        toast({
+          title: successTitle,
+          description: successMessage,
+        });
+      }
+      if (res.status === 400) {
+        toast({
+          title: "Error",
+          description: res.error,
+          variant: "destructive",
+        });
+      }
+      if (res.status === 500) {
+        toast({
+          title: "Error",
+          description: res.error,
+          variant: "destructive",
+        });
+      }
     },
   });
 
@@ -122,6 +129,17 @@ export const TemplateStepForm = ({
       updateStepSignature(functionDefinition, signature, type)
     );
   }, [functionDefinition, signature, type]);
+
+  useEffect(() => {
+    const paramsString = params
+      .map((param) => `${param.name}: ${param.type.toLowerCase()}`)
+      .join(", ");
+    const updatedFunctionDefinition = functionDefinition.replace(
+      /async function\s*\(\s*this:World(?:,\s*.*?)?\s*\)/,
+      `async function(this:World${params.length > 0 ? ", " : ""}${paramsString})`
+    );
+    setFunctionDefinition(updatedFunctionDefinition);
+  }, [params, functionDefinition]);
 
   return (
     <form
@@ -240,6 +258,22 @@ export const TemplateStepForm = ({
               );
             }}
           </form.Field>
+          <form.Field name="params">
+            {(field) => {
+              return (
+                <div className="flex flex-col gap-2 mb-4 lg:w-2/3">
+                  <Label htmlFor={field.name}>Parameters</Label>
+                  <ParamChip
+                    types={Object.values(ParamType)}
+                    onSubmit={(value) => {
+                      field.handleChange(value);
+                      setParams(value as TemplateStepParameter[]);
+                    }}
+                  />
+                </div>
+              );
+            }}
+          </form.Field>
         </div>
         <div className="w-full">
           <Card>
@@ -252,6 +286,7 @@ export const TemplateStepForm = ({
                   return (
                     <div className="flex flex-col gap-2 mb-4 w-full">
                       <CodeMirror
+                        editable={false}
                         value={functionDefinition}
                         onChange={(value) => {
                           field.handleChange(value);

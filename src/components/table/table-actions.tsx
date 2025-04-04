@@ -70,11 +70,11 @@ const TableActions = ({
               const res = await deleteHandler();
               if (res.status === 200) {
                 toast({
-                  title: "Item deleted successfully",
+                  title: "Item(s) deleted successfully",
                 });
               } else {
                 toast({
-                  title: "Error deleting item",
+                  title: "Error deleting item(s)",
                   description: res.error,
                 });
               }

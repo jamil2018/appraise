@@ -3,7 +3,7 @@
 import prisma from "@/config/db-config";
 import { templateStepSchema } from "@/constants/form-opts/template-test-step-form-opts";
 import { ActionResponse } from "@/types/form/actionHandler";
-import { TestCaseTemplateStepType } from "@prisma/client";
+import { ParamType, TestCaseTemplateStepType } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -34,11 +34,18 @@ export async function deleteTemplateStepAction(
   templateStepIds: string[]
 ): Promise<ActionResponse> {
   try {
+    await prisma.templateStepParameter.deleteMany({
+      where: {
+        templateStepId: { in: templateStepIds },
+      },
+    });
+
     await prisma.templateStep.deleteMany({
       where: {
         id: { in: templateStepIds },
       },
     });
+    revalidatePath("/template-steps");
     return {
       status: 200,
       message: "Template steps deleted successfully",
@@ -63,6 +70,13 @@ export async function createTemplateStepAction(
         signature: value.signature,
         description: value.description || "",
         functionDefinition: value.functionDefinition || "",
+        parameters: {
+          create: value.params.map((param) => ({
+            name: param.name,
+            type: param.type as ParamType,
+            order: param.order,
+          })),
+        },
       },
     });
 

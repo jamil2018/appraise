@@ -81,11 +81,11 @@ export function DataTable<TData, TValue>({
       const res = await deleteAction(selectedIds);
       if (res.status === 200) {
         toast({
-          title: "Test suite(s) deleted successfully",
+          title: "Item(s) deleted successfully",
         });
       } else {
         toast({
-          title: "Error deleting test suite(s)",
+          title: "Error deleting item(s)",
           description: res.message,
         });
       }
@@ -130,9 +130,9 @@ export function DataTable<TData, TValue>({
           {deleteAction && (
             <DeletePrompt
               isDisabled={table.getSelectedRowModel().rows.length === 0}
-              dialogTitle="Delete Test Suite"
+              dialogTitle="Delete Item"
               dialogDescription="Please confirm your action"
-              confirmationText="Are you sure you want to delete the selected test suite(s)?"
+              confirmationText="Are you sure you want to delete the selected item(s)?"
               deleteHandler={deleteHandler}
             />
           )}
