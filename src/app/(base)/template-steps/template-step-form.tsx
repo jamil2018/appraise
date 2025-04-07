@@ -24,7 +24,7 @@ import {
 import { useForm } from "@tanstack/react-form";
 import { ServerFormState, initialFormState } from "@tanstack/react-form/nextjs";
 import { z } from "zod";
-import CodeMirror from "@uiw/react-codemirror";
+import CodeMirror, { EditorView } from "@uiw/react-codemirror";
 import { langs } from "@uiw/codemirror-extensions-langs";
 import { githubDark } from "@uiw/codemirror-theme-github";
 import { useEffect, useState } from "react";
@@ -293,7 +293,10 @@ export const TemplateStepForm = ({
                           setFunctionDefinition(value);
                         }}
                         height="200px"
-                        extensions={[langs.typescript()]}
+                        extensions={[
+                          langs.typescript(),
+                          EditorView.lineWrapping,
+                        ]}
                         theme={githubDark}
                       />
                     </div>
