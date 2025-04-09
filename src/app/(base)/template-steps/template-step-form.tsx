@@ -34,7 +34,7 @@ import parserTypescript from "prettier/parser-typescript";
 import estreePlugin from "prettier/plugins/estree";
 import ParamChip from "./paramChip";
 
-let defaultFunctionDefinition = `When('test', async function(this:World){});`;
+let defaultFunctionDefinition = `When('', async function(this:World){});`;
 
 export const TemplateStepForm = ({
   defaultValues,
@@ -235,7 +235,12 @@ export const TemplateStepForm = ({
               );
             }}
           </form.Field>
-          <form.Field name="signature">
+          <form.Field
+            name="signature"
+            validators={{
+              onChange: z.string().min(3, { message: "Signature is required" }),
+            }}
+          >
             {(field) => {
               return (
                 <div className="flex flex-col gap-2 mb-4 lg:w-2/3">
@@ -264,6 +269,7 @@ export const TemplateStepForm = ({
                 <div className="flex flex-col gap-2 mb-4 lg:w-2/3">
                   <Label htmlFor={field.name}>Parameters</Label>
                   <ParamChip
+                    defaultValues={params}
                     types={Object.values(ParamType)}
                     onSubmit={(value) => {
                       field.handleChange(value);

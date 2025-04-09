@@ -44,12 +44,15 @@ type Param = {
 export default function ParamChip({
   types,
   onSubmit,
+  defaultValues,
 }: {
   types: string[];
   onSubmit: (value: Param[]) => void;
+  defaultValues?: Param[];
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [items, setItems] = useState<Param[]>([]);
+  const [items, setItems] = useState<Param[]>(defaultValues || []);
+  console.log(defaultValues);
 
   // Form state
   const [formValues, setFormValues] = useState<FormValues>({

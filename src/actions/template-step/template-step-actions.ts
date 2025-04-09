@@ -94,3 +94,65 @@ export async function createTemplateStepAction(
     };
   }
 }
+
+export async function updateTemplateStepAction(
+  _prev: unknown,
+  value: z.infer<typeof templateStepSchema>,
+  id?: string
+): Promise<ActionResponse> {
+  try {
+    const updatedTemplateStep = await prisma.templateStep.update({
+      where: { id },
+      data: {
+        name: value.name,
+        type: value.type as TestCaseTemplateStepType,
+        signature: value.signature,
+        description: value.description || "",
+        functionDefinition: value.functionDefinition || "",
+        parameters: {
+          deleteMany: {
+            templateStepId: id,
+          },
+          create: value.params.map((param) => ({
+            name: param.name,
+            type: param.type as ParamType,
+            order: param.order,
+          })),
+        },
+      },
+    });
+    revalidatePath("/template-steps");
+    return {
+      status: 200,
+      message: "Template step updated successfully",
+      data: updatedTemplateStep,
+    };
+  } catch (error) {
+    return {
+      status: 500,
+      error: `Server error occurred: ${error}`,
+    };
+  }
+}
+
+export async function getTemplateStepByIdAction(
+  id: string
+): Promise<ActionResponse> {
+  try {
+    const templateStep = await prisma.templateStep.findUnique({
+      where: { id },
+      include: {
+        parameters: true,
+      },
+    });
+    return {
+      status: 200,
+      data: templateStep,
+    };
+  } catch (error) {
+    return {
+      status: 500,
+      error: `Server error occurred: ${error}`,
+    };
+  }
+}
