@@ -40,7 +40,7 @@ enum TestCaseResult {
   UNTESTED
 }
 
-enum TestCaseTemplateStepType {
+enum TemplateStepType {
   ACTION
   ASSERTION
   FLOW_CONTROL
@@ -51,6 +51,12 @@ enum ParamType {
   STRING
   DATE
   BOOLEAN
+}
+
+enum StepParameterValueType {
+  STRING
+  NUMBER
+  LOCATOR
 }
 
 model User {
@@ -70,18 +76,18 @@ model User {
 }
 
 model TestCase {
-  id                String                 @id @default(uuid())
+  id                String             @id @default(uuid())
   title             String
   description       String
   createdBy         String
-  createdAt         DateTime               @default(now())
-  updatedAt         DateTime               @updatedAt
-  creator           User                   @relation("TestCaseCreator", fields: [createdBy], references: [id])
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  creator           User               @relation("TestCaseCreator", fields: [createdBy], references: [id])
   reviews           Review[]
   testRuns          TestRunTestCase[]
   linkedJiraTickets LinkedJiraTicket[]
-  TestSuite         TestSuite[]            @relation("TestSuiteTestCases")
-  steps             TestCaseTemplateStep[]
+  TestSuite         TestSuite[]        @relation("TestSuiteTestCases")
+  steps             TestCaseStep[]
 }
 
 model TestSuite {
@@ -159,16 +165,16 @@ model UserRole {
 }
 
 model TemplateStep {
-  id                    String                   @id @default(uuid())
-  name                  String // e.g., "Click Element", "Enter Text"
-  description           String?
-  type                  TestCaseTemplateStepType
-  parameters            TemplateStepParameter[]
-  signature             String
-  functionDefinition    String?
-  createdAt             DateTime                 @default(now())
-  updatedAt             DateTime                 @updatedAt
-  testCaseTemplateSteps TestCaseTemplateStep[]
+  id                 String                  @id @default(uuid())
+  name               String // e.g., "Click Element", "Enter Text"
+  description        String?
+  type               TemplateStepType
+  parameters         TemplateStepParameter[]
+  signature          String
+  functionDefinition String?
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+  TestCaseStep       TestCaseStep[]
 }
 
 model TemplateStepParameter {
@@ -182,11 +188,30 @@ model TemplateStepParameter {
   templateStepId String
 }
 
-model TestCaseTemplateStep {
-  id             String       @id @default(uuid())
+model TestCaseStep {
+  id             String                  @id @default(uuid())
   testCaseId     String
-  testCase       TestCase     @relation(fields: [testCaseId], references: [id])
+  testCase       TestCase                @relation(fields: [testCaseId], references: [id])
   templateStepId String
-  templateStep   TemplateStep @relation(fields: [templateStepId], references: [id])
+  templateStep   TemplateStep            @relation(fields: [templateStepId], references: [id])
   order          Int // Determined by React Flow
+  parameters     TestCaseStepParameter[]
+}
+
+model TestCaseStepParameter {
+  id             String       @id @default(uuid())
+  name           String
+  value          String
+  type           ParamType
+  order          Int
+  testCaseStep   TestCaseStep @relation(fields: [testCaseStepId], references: [id])
+  testCaseStepId String
+}
+
+model Locator {
+  id        String   @id @default(uuid())
+  name      String
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

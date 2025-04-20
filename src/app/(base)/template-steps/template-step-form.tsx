@@ -18,7 +18,7 @@ import { toast } from "@/hooks/use-toast";
 import { ActionResponse } from "@/types/form/actionHandler";
 import {
   ParamType,
-  TestCaseTemplateStepType,
+  TemplateStepType,
   TemplateStepParameter,
 } from "@prisma/client";
 import { useForm } from "@tanstack/react-form";
@@ -70,9 +70,8 @@ export const TemplateStepForm = ({
   const [functionDefinition, setFunctionDefinition] = useState(
     defaultValues?.functionDefinition ?? defaultFunctionDefinition
   );
-  const [type, setType] = useState<TestCaseTemplateStepType>(
-    (defaultValues?.type as TestCaseTemplateStepType) ??
-      TestCaseTemplateStepType.ACTION
+  const [type, setType] = useState<TemplateStepType>(
+    (defaultValues?.type as TemplateStepType) ?? TemplateStepType.ACTION
   );
   const [params, setParams] = useState<TemplateStepParameter[]>(
     (defaultValues?.params as TemplateStepParameter[]) ?? []
@@ -111,10 +110,10 @@ export const TemplateStepForm = ({
     function updateStepSignature(
       code: string,
       newSignature: string,
-      type: TestCaseTemplateStepType,
+      type: TemplateStepType,
       quoteType: `'` | `"` | "`" = `'`
     ): string {
-      if (type === TestCaseTemplateStepType.ASSERTION) {
+      if (type === TemplateStepType.ASSERTION) {
         return code.replace(
           /(When|Then)\((['"`])(.*?)\2/,
           () => `Then(${quoteType}${newSignature}${quoteType}`
@@ -211,7 +210,7 @@ export const TemplateStepForm = ({
                   <Select
                     onValueChange={(value) => {
                       field.handleChange(value);
-                      setType(value as TestCaseTemplateStepType);
+                      setType(value as TemplateStepType);
                     }}
                     value={field.state.value}
                   >
@@ -219,7 +218,7 @@ export const TemplateStepForm = ({
                       <SelectValue placeholder="Select a type" />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.values(TestCaseTemplateStepType).map((type) => (
+                      {Object.values(TemplateStepType).map((type) => (
                         <SelectItem key={type} value={type}>
                           {type}
                         </SelectItem>

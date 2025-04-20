@@ -3,7 +3,7 @@
 import prisma from "@/config/db-config";
 import { templateStepSchema } from "@/constants/form-opts/template-test-step-form-opts";
 import { ActionResponse } from "@/types/form/actionHandler";
-import { ParamType, TestCaseTemplateStepType } from "@prisma/client";
+import { ParamType, TemplateStepType } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -66,7 +66,7 @@ export async function createTemplateStepAction(
     const newTemplateStep = await prisma.templateStep.create({
       data: {
         name: value.name,
-        type: value.type as TestCaseTemplateStepType,
+        type: value.type as TemplateStepType,
         signature: value.signature,
         description: value.description || "",
         functionDefinition: value.functionDefinition || "",
@@ -105,7 +105,7 @@ export async function updateTemplateStepAction(
       where: { id },
       data: {
         name: value.name,
-        type: value.type as TestCaseTemplateStepType,
+        type: value.type as TemplateStepType,
         signature: value.signature,
         description: value.description || "",
         functionDefinition: value.functionDefinition || "",
