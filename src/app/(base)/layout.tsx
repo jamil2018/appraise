@@ -46,6 +46,9 @@ export default function BaseLayout({
             <NavigationMenuItem>
               <NavLink href="/template-steps">Template Steps</NavLink>
             </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavLink href="/locators">Locators</NavLink>
+            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
       </nav>
