@@ -122,6 +122,7 @@ export function DataTable<TData, TValue>({
                       ).id
                     : ""
                 }`}
+                legacyBehavior
               >
                 <Pencil className="w-4 h-4" />
               </Link>

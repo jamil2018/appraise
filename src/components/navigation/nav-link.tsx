@@ -20,6 +20,7 @@ const NavLink = ({
       <NavigationMenuLink
         className={navigationMenuTriggerStyle()}
         active={pathname === href}
+        href={href}
       >
         {children}
       </NavigationMenuLink>
