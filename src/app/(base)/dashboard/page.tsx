@@ -2,10 +2,10 @@
 import React, { useState, useCallback } from "react";
 import PageHeader from "@/components/typography/page-header";
 import HeaderSubtitle from "@/components/typography/page-header-subtitle";
-import FlowDiagram from "@/components/data-visualization/diagram/flow-diagram";
 import { MousePointerClick } from "lucide-react";
 import { Globe, Keyboard } from "lucide-react";
 import { NodeOrderMap } from "@/types/diagram/diagram";
+import TestCaseFlow from "../test-cases/test-case-flow";
 
 const initialNodesOrder = {
   "1": {
@@ -41,13 +41,12 @@ const initialNodesOrder = {
 const Dashboard = () => {
   const [nodesOrder, setNodesOrder] = useState<NodeOrderMap>({});
 
-  const handleNodeOrderChange = useCallback(
-    (nodeOrder: NodeOrderMap) => {
-      setNodesOrder(nodeOrder);
-    },
-    [setNodesOrder]
-  );
+  const saveNodesOrder = useCallback((nodesOrder: NodeOrderMap) => {
+    setNodesOrder(nodesOrder);
+  }, []);
+
   console.log("nodesOrder:", nodesOrder);
+
   return (
     <div>
       <div className="mb-8">
@@ -57,9 +56,9 @@ const Dashboard = () => {
           them.
         </HeaderSubtitle>
       </div>
-      <FlowDiagram
-        nodeOrder={initialNodesOrder}
-        onNodeOrderChange={handleNodeOrderChange}
+      <TestCaseFlow
+        initialNodesOrder={initialNodesOrder}
+        onNodeOrderChange={saveNodesOrder}
       />
     </div>
   );

@@ -13,7 +13,7 @@ import {
   useNodesState,
   Connection,
 } from "@xyflow/react";
-import { useCallback, useState, useEffect, useMemo } from "react";
+import { useCallback, useState, useEffect, useMemo, memo } from "react";
 import "@xyflow/react/dist/style.css";
 import { Button } from "../../ui/button";
 import ButtonEdge from "./button-edge";
@@ -288,4 +288,4 @@ const FlowDiagram = ({
   );
 };
 
-export default FlowDiagram;
+export default memo(FlowDiagram);

@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,7 +52,10 @@ export default function ParamChip({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [items, setItems] = useState<Param[]>(defaultValues || []);
-  console.log(defaultValues);
+  // Add this useEffect to sync items with defaultValues
+  useEffect(() => {
+    setItems(defaultValues || []);
+  }, [defaultValues]);
 
   // Form state
   const [formValues, setFormValues] = useState<FormValues>({

@@ -75,21 +75,6 @@ model User {
   createdReviews Review[]    @relation("ReviewCreator")
 }
 
-model TestCase {
-  id                String             @id @default(uuid())
-  title             String
-  description       String
-  createdBy         String
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  creator           User               @relation("TestCaseCreator", fields: [createdBy], references: [id])
-  reviews           Review[]
-  testRuns          TestRunTestCase[]
-  linkedJiraTickets LinkedJiraTicket[]
-  TestSuite         TestSuite[]        @relation("TestSuiteTestCases")
-  steps             TestCaseStep[]
-}
-
 model TestSuite {
   id          String     @id @default(uuid())
   name        String
@@ -186,6 +171,21 @@ model TemplateStepParameter {
   updatedAt      DateTime     @updatedAt
   templateStep   TemplateStep @relation(fields: [templateStepId], references: [id])
   templateStepId String
+}
+
+model TestCase {
+  id                String             @id @default(uuid())
+  title             String
+  description       String
+  createdBy         String
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  creator           User               @relation("TestCaseCreator", fields: [createdBy], references: [id])
+  reviews           Review[]
+  testRuns          TestRunTestCase[]
+  linkedJiraTickets LinkedJiraTicket[]
+  TestSuite         TestSuite[]        @relation("TestSuiteTestCases")
+  steps             TestCaseStep[]
 }
 
 model TestCaseStep {

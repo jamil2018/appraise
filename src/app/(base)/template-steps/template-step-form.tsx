@@ -29,12 +29,10 @@ import { langs } from "@uiw/codemirror-extensions-langs";
 import { githubDark } from "@uiw/codemirror-theme-github";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import prettier from "prettier/standalone";
-import parserTypescript from "prettier/parser-typescript";
-import estreePlugin from "prettier/plugins/estree";
 import ParamChip from "./paramChip";
 
-let defaultFunctionDefinition = `When('', async function(this:World){});`;
+const getInitialFunctionDefinition = () =>
+  `When('', async function(this:World){});`;
 
 export const TemplateStepForm = ({
   defaultValues,
@@ -53,22 +51,9 @@ export const TemplateStepForm = ({
     id?: string
   ) => Promise<ActionResponse>;
 }) => {
-  useEffect(() => {
-    const formatFunctionDefinition = async () => {
-      defaultFunctionDefinition = await prettier.format(
-        defaultFunctionDefinition,
-        {
-          parser: "typescript",
-          plugins: [parserTypescript, estreePlugin],
-        }
-      );
-    };
-    formatFunctionDefinition();
-  }, []);
-
   const [signature, setSignature] = useState(defaultValues?.signature ?? "");
   const [functionDefinition, setFunctionDefinition] = useState(
-    defaultValues?.functionDefinition ?? defaultFunctionDefinition
+    defaultValues?.functionDefinition ?? getInitialFunctionDefinition()
   );
   const [type, setType] = useState<TemplateStepType>(
     (defaultValues?.type as TemplateStepType) ?? TemplateStepType.ACTION
@@ -88,6 +73,11 @@ export const TemplateStepForm = ({
           title: successTitle,
           description: successMessage,
         });
+        setSignature("");
+        setFunctionDefinition(getInitialFunctionDefinition());
+        setType(TemplateStepType.ACTION);
+        setParams([]);
+        if (form.reset) form.reset();
       }
       if (res.status === 400) {
         toast({
@@ -105,6 +95,20 @@ export const TemplateStepForm = ({
       }
     },
   });
+
+  // Sync state with defaultValues when it changes (for update operation)
+  useEffect(() => {
+    if (defaultValues) {
+      setSignature(defaultValues.signature ?? "");
+      setFunctionDefinition(
+        defaultValues.functionDefinition ?? getInitialFunctionDefinition()
+      );
+      setType(
+        (defaultValues.type as TemplateStepType) ?? TemplateStepType.ACTION
+      );
+      setParams((defaultValues.params as TemplateStepParameter[]) ?? []);
+    }
+  }, [defaultValues]);
 
   useEffect(() => {
     function updateStepSignature(
@@ -124,21 +128,21 @@ export const TemplateStepForm = ({
         () => `When(${quoteType}${newSignature}${quoteType}`
       );
     }
-    setFunctionDefinition(
-      updateStepSignature(functionDefinition, signature, type)
-    );
-  }, [functionDefinition, signature, type]);
 
-  useEffect(() => {
     const paramsString = params
       .map((param) => `${param.name}: ${param.type.toLowerCase()}`)
       .join(", ");
-    const updatedFunctionDefinition = functionDefinition.replace(
+    let updatedFunctionDefinition = updateStepSignature(
+      functionDefinition,
+      signature,
+      type
+    );
+    updatedFunctionDefinition = updatedFunctionDefinition.replace(
       /async function\s*\(\s*this:World(?:,\s*.*?)?\s*\)/,
       `async function(this:World${params.length > 0 ? ", " : ""}${paramsString})`
     );
     setFunctionDefinition(updatedFunctionDefinition);
-  }, [params, functionDefinition]);
+  }, [signature, type, params, functionDefinition]);
 
   return (
     <form

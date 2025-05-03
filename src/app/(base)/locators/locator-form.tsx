@@ -78,11 +78,12 @@ const LocatorForm = ({
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
               />
-              {field.state.meta.errors.map((error) => (
-                <p key={error as string} className="text-pink-500 text-xs">
-                  {error}
-                </p>
-              ))}
+              {field.state.meta.isTouched &&
+                field.state.meta.errors.map((error) => (
+                  <p key={error as string} className="text-pink-500 text-xs">
+                    {error}
+                  </p>
+                ))}
             </div>
           );
         }}
@@ -102,11 +103,12 @@ const LocatorForm = ({
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
               />
-              {field.state.meta.errors.map((error) => (
-                <p key={error as string} className="text-pink-500 text-xs">
-                  {error}
-                </p>
-              ))}
+              {field.state.meta.isTouched &&
+                field.state.meta.errors.map((error) => (
+                  <p key={error as string} className="text-pink-500 text-xs">
+                    {error}
+                  </p>
+                ))}
             </div>
           );
         }}
