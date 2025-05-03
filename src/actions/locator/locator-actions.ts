@@ -66,3 +66,46 @@ export async function createLocatorAction(
     };
   }
 }
+
+export async function updateLocatorAction(
+  _prev: unknown,
+  value: z.infer<typeof locatorSchema>,
+  id?: string
+): Promise<ActionResponse> {
+  try {
+    const updatedLocator = await prisma.locator.update({
+      where: { id },
+      data: value,
+    });
+    revalidatePath("/locators");
+    return {
+      status: 200,
+      data: updatedLocator,
+      message: "Locator updated successfully",
+    };
+  } catch (e) {
+    return {
+      status: 500,
+      error: `Server error occurred: ${e}`,
+    };
+  }
+}
+
+export async function getLocatorByIdAction(
+  id: string
+): Promise<ActionResponse> {
+  try {
+    const locator = await prisma.locator.findUnique({
+      where: { id },
+    });
+    return {
+      status: 200,
+      data: locator,
+    };
+  } catch (e) {
+    return {
+      status: 500,
+      error: `Server error occurred: ${e}`,
+    };
+  }
+}
