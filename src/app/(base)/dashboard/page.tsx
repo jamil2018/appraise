@@ -7,34 +7,44 @@ import { Globe, Keyboard } from "lucide-react";
 import { NodeOrderMap } from "@/types/diagram/diagram";
 import TestCaseFlow from "../test-cases/test-case-flow";
 
-const initialNodesOrder = {
+const initialNodesOrder: NodeOrderMap = {
   "1": {
     order: 0,
     label: "Navigate",
-    description: "Navigate to the login page",
+    gherkinStep: `Navigate to the "login" page`,
     isFirstNode: true,
     icon: <Globe />,
+    parameters: [{ name: "url", value: "https://example.com", order: 1 }],
   },
   "2": {
     order: 1,
     label: "Input",
-    description: "Fill in the username field with value 'admin'",
+    gherkinStep: `Fill in the "username" field with value "admin"`,
     isFirstNode: false,
     icon: <Keyboard />,
+    parameters: [
+      { name: "field", value: "username", order: 1 },
+      { name: "value", value: "admin", order: 2 },
+    ],
   },
   "3": {
     order: 2,
     label: "Input",
-    description: "Fill in the password field with value 'password'",
+    gherkinStep: `Fill in the "password" field with value "secret"`,
     isFirstNode: false,
     icon: <Keyboard />,
+    parameters: [
+      { name: "field", value: "password", order: 1 },
+      { name: "value", value: "secret", order: 2 },
+    ],
   },
   "4": {
     order: 3,
     label: "Click",
-    description: "Click the login button",
+    gherkinStep: `Click the "login" button`,
     isFirstNode: false,
     icon: <MousePointerClick />,
+    parameters: [{ name: "button", value: "login", order: 1 }],
   },
 };
 

@@ -6,6 +6,8 @@ import { revalidatePath } from "next/cache";
 import { testCaseSchema } from "@/constants/form-opts/test-case-form-opts";
 import { z } from "zod";
 import { auth } from "@/auth";
+import { TestCaseStepParameterType } from "@prisma/client";
+
 /**
  * Get all test cases
  * @returns ActionResponse
@@ -66,8 +68,24 @@ export async function createTestCaseAction(
       data: {
         title: value.title,
         description: value.description ?? "",
-        steps: value.steps,
-        expectedOutcome: value.expectedOutcome,
+        steps: {
+          create: value.steps.map((step) => ({
+            templateStep: {
+              connect: {
+                id: step.templateStepId,
+              },
+            },
+            parameters: {
+              create: step.parameters.map((param) => ({
+                name: param.name,
+                value: param.value,
+                type: param.type as TestCaseStepParameterType,
+                order: param.order,
+              })),
+            },
+            order: step.order,
+          })),
+        },
         creator: {
           connect: {
             id: session?.user?.id,
@@ -100,40 +118,13 @@ export async function getTestCaseByIdAction(
   try {
     const testCase = await prisma.testCase.findUnique({
       where: { id },
+      include: {
+        steps: true,
+      },
     });
     return {
       status: 200,
       data: testCase,
-    };
-  } catch (e) {
-    return {
-      status: 500,
-      error: `Server error occurred: ${e}`,
-    };
-  }
-}
-
-/**
- * Update a test case
- * @param id - Test case id
- * @param testCase - Test case
- * @returns ActionResponse
- */
-export async function updateTestCaseAction(
-  _prev: unknown,
-  value: z.infer<typeof testCaseSchema>,
-  id?: string
-): Promise<ActionResponse> {
-  try {
-    testCaseSchema.parse(value);
-    const updatedTestCase = await prisma.testCase.update({
-      where: { id },
-      data: value,
-    });
-    return {
-      status: 200,
-      message: "Test case updated successfully",
-      data: updatedTestCase,
     };
   } catch (e) {
     return {

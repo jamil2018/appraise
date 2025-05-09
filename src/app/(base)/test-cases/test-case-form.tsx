@@ -117,60 +117,6 @@ const TestCaseForm = ({
           );
         }}
       </form.Field>
-      <form.Field
-        name="steps"
-        validators={{
-          onChange: z
-            .array(z.string())
-            .min(1, { message: "Steps are required" }),
-        }}
-      >
-        {(field) => {
-          return (
-            <div className="flex flex-col gap-2 mb-4 lg:w-1/3">
-              <Label htmlFor={field.name}>Steps</Label>
-              <Textarea
-                id={field.name}
-                name={field.name}
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value.split("\n"))}
-              />
-              {field.state.meta.errors.map((error) => (
-                <p key={error as string} className="text-pink-500 text-xs">
-                  {error}
-                </p>
-              ))}
-            </div>
-          );
-        }}
-      </form.Field>
-      <form.Field
-        name="expectedOutcome"
-        validators={{
-          onChange: z.string().min(3, {
-            message: "Expected outcome must be at least 3 characters",
-          }),
-        }}
-      >
-        {(field) => {
-          return (
-            <div className="flex flex-col gap-2 mb-4 lg:w-1/3">
-              <Label htmlFor={field.name}>Expected Outcome</Label>
-              <Textarea
-                id={field.name}
-                name={field.name}
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-              />
-              {field.state.meta.errors.map((error) => (
-                <p key={error as string} className="text-pink-500 text-xs">
-                  {error}
-                </p>
-              ))}
-            </div>
-          );
-        }}
-      </form.Field>
 
       <form.Subscribe
         selector={(formState) => [formState.canSubmit, formState.isSubmitting]}

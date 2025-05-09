@@ -17,9 +17,10 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { ActionResponse } from "@/types/form/actionHandler";
 import {
-  ParamType,
+  TemplateStepParameterType,
   TemplateStepType,
   TemplateStepParameter,
+  TemplateStepIcon,
 } from "@prisma/client";
 import { useForm } from "@tanstack/react-form";
 import { ServerFormState, initialFormState } from "@tanstack/react-form/nextjs";
@@ -201,6 +202,32 @@ export const TemplateStepForm = ({
               );
             }}
           </form.Field>
+          <form.Field name="icon">
+            {(field) => {
+              return (
+                <div className="flex flex-col gap-2 mb-4 lg:w-2/3">
+                  <Label htmlFor={field.name}>Icon</Label>
+                  <Select
+                    onValueChange={(value) => {
+                      field.handleChange(value);
+                    }}
+                    value={field.state.value}
+                  >
+                    <SelectTrigger id={field.name}>
+                      <SelectValue placeholder="Select an icon" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(TemplateStepIcon).map((icon) => (
+                        <SelectItem key={icon} value={icon}>
+                          {icon}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              );
+            }}
+          </form.Field>
           <form.Field
             name="type"
             validators={{
@@ -273,7 +300,7 @@ export const TemplateStepForm = ({
                   <Label htmlFor={field.name}>Parameters</Label>
                   <ParamChip
                     defaultValues={params}
-                    types={Object.values(ParamType)}
+                    types={Object.values(TemplateStepParameterType)}
                     onSubmit={(value) => {
                       field.handleChange(value);
                       setParams(value as TemplateStepParameter[]);

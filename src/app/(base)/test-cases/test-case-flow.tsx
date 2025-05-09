@@ -1,4 +1,4 @@
-import FlowDiagram from "@/components/data-visualization/diagram/flow-diagram";
+import FlowDiagram from "./diagram/flow-diagram";
 import { NodeOrderMap } from "@/types/diagram/diagram";
 import React, { useCallback, useEffect, useState, useRef } from "react";
 

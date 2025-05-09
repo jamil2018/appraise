@@ -15,7 +15,7 @@ import {
 } from "@xyflow/react";
 import { useCallback, useState, useEffect, useMemo, memo } from "react";
 import "@xyflow/react/dist/style.css";
-import { Button } from "../../ui/button";
+import { Button } from "@/components/ui/button";
 import ButtonEdge from "./button-edge";
 import { Plus } from "lucide-react";
 import { DialogClose } from "@/components/ui/dialog";
@@ -53,9 +53,10 @@ const FlowDiagram = ({
       sortedEntries.forEach(([id, nodeData], index) => {
         const baseNodeData = {
           label: nodeData.label,
-          description: nodeData.description || "",
+          gherkinStep: nodeData.gherkinStep || "",
           isFirstNode: nodeData.isFirstNode || false,
           icon: nodeData.icon || "",
+          parameters: nodeData.parameters,
         };
 
         // Skip isolated nodes (order === -1)
@@ -152,9 +153,12 @@ const FlowDiagram = ({
         orders[node.id] = {
           order: -1,
           label: node.data.label as string,
-          description: node.data.description as string | undefined,
+          gherkinStep: node.data.gherkinStep as string | undefined,
           isFirstNode: node.data.isFirstNode as boolean | undefined,
           icon: node.data.icon as React.ReactNode | undefined,
+          parameters: node.data.parameters as
+            | { name: string; value: string; order: number }[]
+            | undefined,
         };
       }
     });
@@ -166,9 +170,12 @@ const FlowDiagram = ({
       orders[currentId] = {
         order: orderNum++,
         label: currentNode.data.label as string,
-        description: currentNode.data.description as string | undefined,
+        gherkinStep: currentNode.data.gherkinStep as string | undefined,
         isFirstNode: currentNode.data.isFirstNode as boolean | undefined,
         icon: currentNode.data.icon as React.ReactNode | undefined,
+        parameters: currentNode.data.parameters as
+          | { name: string; value: string; order: number }[]
+          | undefined,
       };
 
       // Process neighbors
@@ -186,9 +193,12 @@ const FlowDiagram = ({
         orders[node.id] = {
           order: orderNum++,
           label: node.data.label as string,
-          description: node.data.description as string | undefined,
+          gherkinStep: node.data.gherkinStep as string | undefined,
           isFirstNode: node.data.isFirstNode as boolean | undefined,
           icon: node.data.icon as React.ReactNode | undefined,
+          parameters: node.data.parameters as
+            | { name: string; value: string; order: number }[]
+            | undefined,
         };
       }
     });
@@ -228,9 +238,18 @@ const FlowDiagram = ({
   );
 
   const addNode = useCallback(() => {
-    const newNode = {
+    const newNode: Node = {
       id: crypto.randomUUID(),
-      data: { label: `Node new` },
+      data: {
+        label: `Node new`,
+        gherkinStep: "Test Step",
+        isFirstNode: false,
+        icon: <Plus />,
+        parameters: [
+          { name: "param1", value: "value1", order: 1 },
+          { name: "param2", value: "value2", order: 2 },
+        ],
+      },
       position: { x: 0, y: 0 },
       type: "optionsHeaderNode",
     };

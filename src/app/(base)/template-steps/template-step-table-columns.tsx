@@ -52,6 +52,12 @@ export const templateStepTableCols: ColumnDef<TemplateStep>[] = [
     ),
   },
   {
+    accessorKey: "icon",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Icon" />
+    ),
+  },
+  {
     accessorKey: "type",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Type" />

@@ -3,7 +3,11 @@
 import prisma from "@/config/db-config";
 import { templateStepSchema } from "@/constants/form-opts/template-test-step-form-opts";
 import { ActionResponse } from "@/types/form/actionHandler";
-import { ParamType, TemplateStepType } from "@prisma/client";
+import {
+  TemplateStepParameterType,
+  TemplateStepIcon,
+  TemplateStepType,
+} from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -73,10 +77,11 @@ export async function createTemplateStepAction(
         parameters: {
           create: value.params.map((param) => ({
             name: param.name,
-            type: param.type as ParamType,
+            type: param.type as TemplateStepParameterType,
             order: param.order,
           })),
         },
+        icon: value.icon as TemplateStepIcon,
       },
     });
 
@@ -115,7 +120,7 @@ export async function updateTemplateStepAction(
           },
           create: value.params.map((param) => ({
             name: param.name,
-            type: param.type as ParamType,
+            type: param.type as TemplateStepParameterType,
             order: param.order,
           })),
         },

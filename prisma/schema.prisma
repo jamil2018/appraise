@@ -46,17 +46,40 @@ enum TemplateStepType {
   FLOW_CONTROL
 }
 
-enum ParamType {
+enum TemplateStepParameterType {
   NUMBER
   STRING
   DATE
   BOOLEAN
 }
 
+enum TestCaseStepParameterType {
+  STRING
+  NUMBER
+  BOOLEAN
+  DATE
+  LOCATOR
+}
+
 enum StepParameterValueType {
   STRING
   NUMBER
   LOCATOR
+}
+
+enum TemplateStepIcon {
+  MOUSE
+  NAVIGATION
+  INPUT
+  DOWNLOAD
+  API
+  STORE
+  FORMAT
+  DATA
+  UPLOAD
+  WAIT
+  VALIDATION
+  DEBUG
 }
 
 model User {
@@ -153,6 +176,7 @@ model TemplateStep {
   id                 String                  @id @default(uuid())
   name               String // e.g., "Click Element", "Enter Text"
   description        String?
+  icon               TemplateStepIcon
   type               TemplateStepType
   parameters         TemplateStepParameter[]
   signature          String
@@ -163,13 +187,13 @@ model TemplateStep {
 }
 
 model TemplateStepParameter {
-  id             String       @id @default(uuid())
+  id             String                    @id @default(uuid())
   name           String
-  type           ParamType
+  type           TemplateStepParameterType
   order          Int
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  templateStep   TemplateStep @relation(fields: [templateStepId], references: [id])
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+  templateStep   TemplateStep              @relation(fields: [templateStepId], references: [id])
   templateStepId String
 }
 
@@ -199,19 +223,22 @@ model TestCaseStep {
 }
 
 model TestCaseStepParameter {
-  id             String       @id @default(uuid())
+  id             String                    @id @default(uuid())
   name           String
   value          String
-  type           ParamType
+  type           TestCaseStepParameterType
   order          Int
-  testCaseStep   TestCaseStep @relation(fields: [testCaseStepId], references: [id])
+  testCaseStep   TestCaseStep              @relation(fields: [testCaseStepId], references: [id])
   testCaseStepId String
+  Locator        Locator?                  @relation(fields: [locatorId], references: [id])
+  locatorId      String?
 }
 
 model Locator {
-  id        String   @id @default(uuid())
-  name      String
-  value     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String                  @id @default(uuid())
+  name           String
+  value          String
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+  stepParameters TestCaseStepParameter[]
 }

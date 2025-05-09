@@ -13,7 +13,7 @@ import {
 
 interface OptionsHeaderNodeData {
   label: string;
-  description: string;
+  gherkinStep: string;
   isFirstNode?: boolean;
   icon?: React.ReactNode;
 }
@@ -21,7 +21,7 @@ interface OptionsHeaderNodeData {
 const OptionsHeaderNode = memo(({ selected, data }: NodeProps) => {
   OptionsHeaderNode.displayName = "OptionsHeaderNode";
 
-  const { label, description, isFirstNode, icon } =
+  const { label, gherkinStep, isFirstNode, icon } =
     data as unknown as OptionsHeaderNodeData;
 
   return (
@@ -34,7 +34,7 @@ const OptionsHeaderNode = memo(({ selected, data }: NodeProps) => {
           <NodeHeaderDeleteAction />
         </NodeHeaderActions>
       </NodeHeader>
-      <div className="mt-2">{description}</div>
+      <div className="mt-2">{gherkinStep}</div>
       <Handle type="source" position={Position.Right} />
     </BaseNode>
   );

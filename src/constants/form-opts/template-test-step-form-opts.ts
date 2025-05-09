@@ -15,6 +15,7 @@ export const templateStepSchema = z.object({
       order: z.number(),
     })
   ),
+  icon: z.string(),
 });
 
 export type TemplateStep = z.infer<typeof templateStepSchema>;
@@ -27,5 +28,6 @@ export const formOpts = formOptions({
     signature: "",
     functionDefinition: "",
     params: [],
+    icon: "MOUSE",
   } as TemplateStep,
 });
