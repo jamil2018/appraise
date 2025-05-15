@@ -7,8 +7,7 @@ export const nodeDataSchema = z.object({
   gherkinStep: z
     .string()
     .min(3, { message: "Gherkin step must be at least 3 characters" }),
-  isFirstNode: z.boolean(),
-  icon: z.string(),
+  templateStepId: z.string(),
   parameters: z.array(
     z.object({
       name: z.string(),
@@ -26,8 +25,7 @@ export const formOpts = formOptions({
   defaultValues: {
     label: "",
     gherkinStep: "",
-    isFirstNode: false,
-    icon: "",
+    templateStepId: "",
     parameters: [],
     order: 0,
   } as NodeData,
