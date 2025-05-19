@@ -17,7 +17,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { ActionResponse } from "@/types/form/actionHandler";
 import {
-  TemplateStepParameterType,
+  StepParameterType,
   TemplateStepType,
   TemplateStepParameter,
   TemplateStepIcon,
@@ -300,7 +300,7 @@ export const TemplateStepForm = ({
                   <Label htmlFor={field.name}>Parameters</Label>
                   <ParamChip
                     defaultValues={params}
-                    types={Object.values(TemplateStepParameterType)}
+                    types={Object.values(StepParameterType)}
                     onSubmit={(value) => {
                       field.handleChange(value);
                       setParams(value as TemplateStepParameter[]);

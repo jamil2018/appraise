@@ -4,7 +4,7 @@ import prisma from "@/config/db-config";
 import { templateStepSchema } from "@/constants/form-opts/template-test-step-form-opts";
 import { ActionResponse } from "@/types/form/actionHandler";
 import {
-  TemplateStepParameterType,
+  StepParameterType,
   TemplateStepIcon,
   TemplateStepType,
 } from "@prisma/client";
@@ -77,7 +77,7 @@ export async function createTemplateStepAction(
         parameters: {
           create: value.params.map((param) => ({
             name: param.name,
-            type: param.type as TemplateStepParameterType,
+            type: param.type as StepParameterType,
             order: param.order,
           })),
         },
@@ -120,7 +120,7 @@ export async function updateTemplateStepAction(
           },
           create: value.params.map((param) => ({
             name: param.name,
-            type: param.type as TemplateStepParameterType,
+            type: param.type as StepParameterType,
             order: param.order,
           })),
         },
@@ -153,6 +153,21 @@ export async function getTemplateStepByIdAction(
     return {
       status: 200,
       data: templateStep,
+    };
+  } catch (error) {
+    return {
+      status: 500,
+      error: `Server error occurred: ${error}`,
+    };
+  }
+}
+
+export async function getAllTemplateStepParamsAction(): Promise<ActionResponse> {
+  try {
+    const templateStepParams = await prisma.templateStepParameter.findMany({});
+    return {
+      status: 200,
+      data: templateStepParams,
     };
   } catch (error) {
     return {

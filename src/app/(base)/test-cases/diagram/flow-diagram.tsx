@@ -18,12 +18,10 @@ import "@xyflow/react/dist/style.css";
 import { Button } from "@/components/ui/button";
 import ButtonEdge from "./button-edge";
 import { Plus } from "lucide-react";
-import { DialogClose } from "@/components/ui/dialog";
-import { DialogFooter, DialogTitle } from "@/components/ui/dialog";
-import { Dialog, DialogHeader } from "@/components/ui/dialog";
-import { DialogContent } from "@/components/ui/dialog";
 import OptionsHeaderNode from "./options-header-node";
 import { NodeOrderMap } from "@/types/diagram/diagram";
+import NodeForm from "./node-form";
+import { Locator, TemplateStep, TemplateStepParameter } from "@prisma/client";
 
 const edgeTypes = {
   buttonEdge: ButtonEdge,
@@ -34,9 +32,15 @@ const nodeTypes = {
 
 const FlowDiagram = ({
   nodeOrder,
+  templateStepParams,
+  templateSteps,
+  locators,
   onNodeOrderChange,
 }: {
   nodeOrder: NodeOrderMap;
+  templateStepParams: TemplateStepParameter[];
+  templateSteps: TemplateStep[];
+  locators: Locator[];
   onNodeOrderChange: (nodeOrder: NodeOrderMap) => void;
 }) => {
   const generateInitialNodesAndEdges = useCallback(
@@ -284,25 +288,29 @@ const FlowDiagram = ({
           }}
           connectOnClick={false}
           isValidConnection={isValidConnection}
+          proOptions={{ hideAttribution: true }}
         >
           <Background />
           <Controls />
         </ReactFlow>
       </div>
 
-      <Dialog open={showAddNodeDialog} onOpenChange={setShowAddNodeDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add a new Node</DialogTitle>
-          </DialogHeader>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button onClick={addNode}>Save</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <NodeForm
+        onSubmitAction={addNode}
+        initialValues={{
+          label: "",
+          gherkinStep: "",
+          templateStepId: "",
+          parameters: [],
+          order: 0,
+        }}
+        templateSteps={templateSteps}
+        templateStepParams={templateStepParams}
+        showAddNodeDialog={showAddNodeDialog}
+        addNodeHandler={addNode}
+        setShowAddNodeDialog={setShowAddNodeDialog}
+        locators={locators}
+      />
     </>
   );
 };

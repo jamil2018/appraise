@@ -1,18 +1,16 @@
-import { TestCaseStepParameterType } from "@prisma/client";
+import { StepParameterType } from "@prisma/client";
 import { formOptions } from "@tanstack/react-form/nextjs";
 import { z } from "zod";
 
 export const nodeDataSchema = z.object({
   label: z.string().min(3, { message: "Label must be at least 3 characters" }),
-  gherkinStep: z
-    .string()
-    .min(3, { message: "Gherkin step must be at least 3 characters" }),
-  templateStepId: z.string(),
+  gherkinStep: z.string().min(1, { message: "Gherkin step is required" }),
+  templateStepId: z.string().min(1, { message: "Template step is required" }),
   parameters: z.array(
     z.object({
       name: z.string(),
       value: z.string(),
-      type: z.nativeEnum(TestCaseStepParameterType),
+      type: z.nativeEnum(StepParameterType),
       order: z.number(),
     })
   ),

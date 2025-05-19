@@ -46,18 +46,11 @@ enum TemplateStepType {
   FLOW_CONTROL
 }
 
-enum TemplateStepParameterType {
+enum StepParameterType {
   NUMBER
   STRING
   DATE
   BOOLEAN
-}
-
-enum TestCaseStepParameterType {
-  STRING
-  NUMBER
-  BOOLEAN
-  DATE
   LOCATOR
 }
 
@@ -187,13 +180,13 @@ model TemplateStep {
 }
 
 model TemplateStepParameter {
-  id             String                    @id @default(uuid())
+  id             String            @id @default(uuid())
   name           String
-  type           TemplateStepParameterType
+  type           StepParameterType
   order          Int
-  createdAt      DateTime                  @default(now())
-  updatedAt      DateTime                  @updatedAt
-  templateStep   TemplateStep              @relation(fields: [templateStepId], references: [id])
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  templateStep   TemplateStep      @relation(fields: [templateStepId], references: [id])
   templateStepId String
 }
 
@@ -223,14 +216,14 @@ model TestCaseStep {
 }
 
 model TestCaseStepParameter {
-  id             String                    @id @default(uuid())
+  id             String            @id @default(uuid())
   name           String
   value          String
-  type           TestCaseStepParameterType
+  type           StepParameterType
   order          Int
-  testCaseStep   TestCaseStep              @relation(fields: [testCaseStepId], references: [id])
+  testCaseStep   TestCaseStep      @relation(fields: [testCaseStepId], references: [id])
   testCaseStepId String
-  Locator        Locator?                  @relation(fields: [locatorId], references: [id])
+  Locator        Locator?          @relation(fields: [locatorId], references: [id])
   locatorId      String?
 }
 
