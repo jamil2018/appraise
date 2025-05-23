@@ -32,7 +32,8 @@ interface DynamicFormFieldsProps {
       value: string;
       type: StepParameterType;
       order: number;
-    }[]
+    }[],
+    isValid: boolean
   ) => void;
 }
 
@@ -63,8 +64,7 @@ export default function DynamicFormFields({
           values[param.name] = false;
           break;
         case "LOCATOR":
-          values[param.name] =
-            uniqueLocators.length > 0 ? uniqueLocators[0] : "";
+          values[param.name] = "";
           break;
       }
     });
@@ -143,7 +143,29 @@ export default function DynamicFormFields({
           order: param.order,
         };
       });
-      onChange(formattedValues);
+
+      // Validation function
+      const isValid = templateStepParams.every((param) => {
+        const v = formattedValues.find((fv) => fv.name === param.name)?.value;
+        switch (param.type) {
+          case "NUMBER":
+            return (
+              v !== undefined && v !== null && v !== "" && !isNaN(Number(v))
+            );
+          case "STRING":
+            return v !== undefined && v !== null && v.trim() !== "";
+          case "DATE":
+            return v !== undefined && v !== null && v !== "";
+          case "BOOLEAN":
+            return v === "true" || v === "false";
+          case "LOCATOR":
+            return v !== undefined && v !== null && v !== "";
+          default:
+            return false;
+        }
+      });
+
+      onChange(formattedValues, isValid);
     }
   };
 
@@ -155,13 +177,16 @@ export default function DynamicFormFields({
       case "NUMBER":
         return (
           <div className="grid w-full items-center gap-1.5">
-            <Label htmlFor={`input-${name}`}>{name}</Label>
+            <Label htmlFor={`input-${name}`}>
+              {name} <span className="text-red-500">*</span>
+            </Label>
             <Input
               id={`input-${name}`}
               type="number"
               value={typeof values[name] === "number" ? values[name] : 0}
               onChange={(e) => handleInputChange(name, Number(e.target.value))}
               className="w-full"
+              required
             />
           </div>
         );
@@ -169,13 +194,16 @@ export default function DynamicFormFields({
       case "STRING":
         return (
           <div className="grid w-full items-center gap-1.5">
-            <Label htmlFor={`input-${name}`}>{name}</Label>
+            <Label htmlFor={`input-${name}`}>
+              {name} <span className="text-red-500">*</span>
+            </Label>
             <Input
               id={`input-${name}`}
               type="text"
               value={typeof values[name] === "string" ? values[name] : ""}
               onChange={(e) => handleInputChange(name, e.target.value)}
               className="w-full"
+              required
             />
           </div>
         );
@@ -183,7 +211,9 @@ export default function DynamicFormFields({
       case "DATE":
         return (
           <div className="grid w-full items-center gap-1.5">
-            <Label>{name}</Label>
+            <Label>
+              {name} <span className="text-red-500">*</span>
+            </Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -192,11 +222,14 @@ export default function DynamicFormFields({
                     "w-full justify-start text-left font-normal",
                     !values[name] && "text-muted-foreground"
                   )}
+                  aria-required="true"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {values[name] instanceof Date
-                    ? format(values[name] as Date, "PPP")
-                    : "Pick a date"}
+                  {values[name] instanceof Date ? (
+                    format(values[name] as Date, "PPP")
+                  ) : (
+                    <span className="text-red-500">Pick a date *</span>
+                  )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -209,6 +242,7 @@ export default function DynamicFormFields({
                   }
                   onSelect={(date) => handleInputChange(name, date as Date)}
                   initialFocus
+                  required
                 />
               </PopoverContent>
             </Popover>
@@ -218,7 +252,9 @@ export default function DynamicFormFields({
       case "BOOLEAN":
         return (
           <div className="grid w-full items-center gap-1.5">
-            <Label htmlFor={`select-${name}`}>{name}</Label>
+            <Label htmlFor={`select-${name}`}>
+              {name} <span className="text-red-500">*</span>
+            </Label>
             <Select
               value={
                 typeof values[name] === "boolean"
@@ -228,9 +264,10 @@ export default function DynamicFormFields({
               onValueChange={(value) =>
                 handleInputChange(name, value === "true")
               }
+              required
             >
               <SelectTrigger id={`select-${name}`} className="w-full">
-                <SelectValue placeholder="Select a value" />
+                <SelectValue placeholder="Select a value *" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="true">True</SelectItem>
@@ -243,17 +280,16 @@ export default function DynamicFormFields({
       case "LOCATOR":
         return (
           <div className="grid w-full items-center gap-1.5">
-            <Label htmlFor={`select-${name}`}>{name}</Label>
+            <Label htmlFor={`select-${name}`}>
+              {name} <span className="text-red-500">*</span>
+            </Label>
             <Select
-              value={
-                typeof values[name] === "string"
-                  ? values[name]
-                  : uniqueLocators[0] || ""
-              }
+              value={typeof values[name] === "string" ? values[name] : ""}
               onValueChange={(value) => handleInputChange(name, value)}
+              required
             >
               <SelectTrigger id={`select-${name}`} className="w-full">
-                <SelectValue placeholder="Select a locator" />
+                <SelectValue placeholder="Select a locator *" />
               </SelectTrigger>
               <SelectContent>
                 {uniqueLocators.map((locator) => (

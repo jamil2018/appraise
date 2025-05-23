@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { formOpts, NodeData } from "@/constants/form-opts/diagram/node-form";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
@@ -27,36 +27,43 @@ import { Button } from "@/components/ui/button";
 import DynamicFormFields from "./dynamic-parameters";
 
 const NodeForm = ({
-  onSubmitAction,
   templateSteps,
   templateStepParams,
   initialValues,
   showAddNodeDialog,
   locators,
-  addNodeHandler,
   setShowAddNodeDialog,
 }: {
-  onSubmitAction: (values: NodeData) => void;
-  initialValues: NodeData;
   templateSteps: TemplateStep[];
   templateStepParams: TemplateStepParameter[];
+  initialValues: NodeData;
   showAddNodeDialog: boolean;
   locators: Locator[];
-  addNodeHandler: () => void;
   setShowAddNodeDialog: (show: boolean) => void;
 }) => {
   const [selectedTemplateStepParams, setSelectedTemplateStepParams] = useState<
     TemplateStepParameter[]
   >([]);
+  const [selectedTemplateStep, setSelectedTemplateStep] =
+    useState<TemplateStep | null>(null);
+
+  const [gherkinStep, setGherkinStep] = useState<string>("");
 
   const form = useForm({
     defaultValues: initialValues,
     validators: formOpts?.validators,
     onSubmit: async ({ value }) => {
       console.log(value);
-      // onSubmitAction(value);
+      resetForm();
     },
   });
+
+  const resetForm = useCallback(() => {
+    setShowAddNodeDialog(false);
+    setSelectedTemplateStepParams([]);
+    setSelectedTemplateStep(null);
+    form.reset();
+  }, [form, setShowAddNodeDialog]);
 
   return (
     <Dialog open={showAddNodeDialog} onOpenChange={setShowAddNodeDialog}>
@@ -72,7 +79,7 @@ const NodeForm = ({
             <DialogTitle>Add a new Node</DialogTitle>
           </DialogHeader>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 w-full">
             <div className="w-full">
               <form.Field
                 name="label"
@@ -82,7 +89,7 @@ const NodeForm = ({
               >
                 {(field) => {
                   return (
-                    <div className="flex flex-col gap-2 mb-4 lg:w-2/3">
+                    <div className="flex flex-col gap-2 mb-4 w-full">
                       <Label htmlFor={field.name}>Label</Label>
                       <Input
                         id={field.name}
@@ -112,7 +119,7 @@ const NodeForm = ({
               >
                 {(field) => {
                   return (
-                    <div className="flex flex-col gap-2 mb-4 lg:w-2/3">
+                    <div className="flex flex-col gap-2 mb-4 w-full">
                       <Label htmlFor={field.name}>Template Step</Label>
                       <Select
                         name={field.name}
@@ -153,23 +160,42 @@ const NodeForm = ({
                 <form.Field
                   name="parameters"
                   validators={{
-                    onChange: z.array(
-                      z.object({
-                        name: z.string(),
-                        value: z.string(),
-                        type: z.nativeEnum(StepParameterType),
-                        order: z.number(),
-                      })
-                    ),
+                    onChange: z
+                      .array(
+                        z.object({
+                          name: z.string(),
+                          value: z.string(),
+                          type: z.nativeEnum(StepParameterType),
+                          order: z.number(),
+                        })
+                      )
+                      .min(selectedTemplateStepParams.length, {
+                        message: "All parameters are required",
+                      }),
                   }}
                 >
                   {(field) => {
                     return (
-                      <div className="flex flex-col gap-2 mb-4 lg:w-2/3">
+                      <div className="flex flex-col gap-2 mb-4 w-full">
                         <DynamicFormFields
                           templateStepParams={selectedTemplateStepParams}
                           locators={locators.map((locator) => locator.name)}
-                          onChange={field.handleChange}
+                          onChange={(values, isValid) => {
+                            if (!isValid) {
+                              field.setMeta((prev) => ({
+                                ...prev,
+                                errors: [
+                                  "Please fill all required parameter fields.",
+                                ],
+                              }));
+                            } else {
+                              field.setMeta((prev) => ({
+                                ...prev,
+                                errors: [],
+                              }));
+                            }
+                            field.handleChange(values);
+                          }}
                         />
                         {field.state.meta.errors.map((error) => (
                           <p
@@ -194,10 +220,11 @@ const NodeForm = ({
               >
                 {(field) => {
                   return (
-                    <div className="flex flex-col gap-2 mb-4 lg:w-2/3">
+                    <div className="flex flex-col gap-2 mb-4 w-full">
                       <Label htmlFor={field.name}>Gherkin Step</Label>
                       <Input
                         id={field.name}
+                        disabled
                         name={field.name}
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
@@ -222,7 +249,7 @@ const NodeForm = ({
               >
                 {(field) => {
                   return (
-                    <div className="flex flex-col gap-2 mb-4 lg:w-2/3">
+                    <div className="flex flex-col gap-2 mb-4 w-full">
                       <Label htmlFor={field.name}>Order</Label>
                       <Input
                         id={field.name}
@@ -249,7 +276,9 @@ const NodeForm = ({
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline" onClick={resetForm}>
+                Cancel
+              </Button>
             </DialogClose>
             <form.Subscribe
               selector={(formState) => [
@@ -258,7 +287,11 @@ const NodeForm = ({
               ]}
             >
               {([canSubmit, isSubmitting]) => (
-                <Button type="submit" disabled={!canSubmit}>
+                <Button
+                  type="submit"
+                  disabled={!canSubmit}
+                  onClick={() => form.handleSubmit()}
+                >
                   {isSubmitting ? "..." : "Save"}
                 </Button>
               )}
