@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { formOpts, NodeData } from "@/constants/form-opts/diagram/node-form";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
@@ -25,6 +25,7 @@ import { Dialog, DialogFooter } from "@/components/ui/dialog";
 import { DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import DynamicFormFields from "./dynamic-parameters";
+import { generateGherkinStep } from "@/lib/transformers/gherkin-converter";
 
 const NodeForm = ({
   templateSteps,
@@ -48,12 +49,74 @@ const NodeForm = ({
     useState<TemplateStep | null>(null);
 
   const [gherkinStep, setGherkinStep] = useState<string>("");
+  const [parameters, setParameters] = useState<
+    {
+      name: string;
+      value: string;
+      type: StepParameterType;
+      order: number;
+    }[]
+  >([]);
+  const [parameterErrors, setParameterErrors] = useState<{
+    [key: string]: string;
+  }>({});
+
+  const validateParameters = (
+    values: {
+      name: string;
+      value: string;
+      type: StepParameterType;
+      order: number;
+    }[]
+  ) => {
+    const errors: { [key: string]: string } = {};
+
+    values.forEach((param) => {
+      if (!param.value || param.value.trim() === "") {
+        errors[param.name] = `${param.name} is required`;
+      }
+
+      if (param.type === "NUMBER" && isNaN(Number(param.value))) {
+        errors[param.name] = `${param.name} must be a number`;
+      }
+
+      if (param.type === "DATE" && !isValidDate(param.value)) {
+        errors[param.name] = `${param.name} must be a valid date`;
+      }
+    });
+
+    setParameterErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const isValidDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date instanceof Date && !isNaN(date.getTime());
+  };
+
+  const handleParametersChange = (
+    values: {
+      name: string;
+      value: string;
+      type: StepParameterType;
+      order: number;
+    }[]
+  ) => {
+    const isValid = validateParameters(values);
+    if (isValid) {
+      setParameters(values);
+    }
+  };
 
   const form = useForm({
     defaultValues: initialValues,
     validators: formOpts?.validators,
     onSubmit: async ({ value }) => {
+      if (!validateParameters(parameters)) {
+        return;
+      }
       console.log(value);
+      console.log("parameters", parameters);
       resetForm();
     },
   });
@@ -62,8 +125,20 @@ const NodeForm = ({
     setShowAddNodeDialog(false);
     setSelectedTemplateStepParams([]);
     setSelectedTemplateStep(null);
+    setParameters([]);
+    setParameterErrors({});
+    setGherkinStep("");
     form.reset();
   }, [form, setShowAddNodeDialog]);
+
+  useEffect(() => {
+    if (selectedTemplateStep) {
+      // console.log(selectedTemplateStep.signature, parameters);
+      setGherkinStep(
+        generateGherkinStep(selectedTemplateStep.signature, parameters)
+      );
+    }
+  }, [selectedTemplateStep, parameters]);
 
   return (
     <Dialog open={showAddNodeDialog} onOpenChange={setShowAddNodeDialog}>
@@ -131,6 +206,10 @@ const NodeForm = ({
                               (param) => param.templateStepId === value
                             )
                           );
+                          setSelectedTemplateStep(
+                            templateSteps.find((step) => step.id === value) ||
+                              null
+                          );
                         }}
                       >
                         <SelectTrigger>
@@ -156,66 +235,23 @@ const NodeForm = ({
                   );
                 }}
               </form.Field>
-              {selectedTemplateStepParams.length > 0 && (
-                <form.Field
-                  name="parameters"
-                  validators={{
-                    onChange: z
-                      .array(
-                        z.object({
-                          name: z.string(),
-                          value: z.string(),
-                          type: z.nativeEnum(StepParameterType),
-                          order: z.number(),
-                        })
-                      )
-                      .min(selectedTemplateStepParams.length, {
-                        message: "All parameters are required",
-                      }),
-                  }}
-                >
-                  {(field) => {
-                    return (
-                      <div className="flex flex-col gap-2 mb-4 w-full">
-                        <DynamicFormFields
-                          templateStepParams={selectedTemplateStepParams}
-                          locators={locators.map((locator) => locator.name)}
-                          onChange={(values, isValid) => {
-                            if (!isValid) {
-                              field.setMeta((prev) => ({
-                                ...prev,
-                                errors: [
-                                  "Please fill all required parameter fields.",
-                                ],
-                              }));
-                            } else {
-                              field.setMeta((prev) => ({
-                                ...prev,
-                                errors: [],
-                              }));
-                            }
-                            field.handleChange(values);
-                          }}
-                        />
-                        {field.state.meta.errors.map((error) => (
-                          <p
-                            key={error as string}
-                            className="text-pink-500 text-xs"
-                          >
-                            {error}
-                          </p>
-                        ))}
-                      </div>
-                    );
-                  }}
-                </form.Field>
-              )}
+
+              <div className="flex flex-col gap-2 mb-4 w-full">
+                <DynamicFormFields
+                  templateStepParams={selectedTemplateStepParams}
+                  locators={locators.map((locator) => locator.name)}
+                  onChange={handleParametersChange}
+                />
+                {Object.entries(parameterErrors).map(([name, error]) => (
+                  <p key={name} className="text-pink-500 text-xs">
+                    {error}
+                  </p>
+                ))}
+              </div>
               <form.Field
                 name="gherkinStep"
                 validators={{
-                  onChange: z
-                    .string()
-                    .min(1, { message: "Gherkin step is required" }),
+                  onChange: z.string(),
                 }}
               >
                 {(field) => {
@@ -226,8 +262,11 @@ const NodeForm = ({
                         id={field.name}
                         disabled
                         name={field.name}
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
+                        value={gherkinStep}
+                        onChange={(e) => {
+                          setGherkinStep(e.target.value);
+                          field.handleChange(e.target.value);
+                        }}
                       />
                       {field.state.meta.errors.map((error) => (
                         <p
